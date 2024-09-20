@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinaria</title>
+    <!-- Pico CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        header, footer {
+            background-color: #6200ea;
+            color: white;
+            padding: 1rem;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        nav ul li {
+            margin: 0;
+        }
+
+        footer {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Veterinaria</h1>
+    </header>
+
+    <main>
+        <nav>
+            <ul>
+                <li><a href="crudcliente" role="button" class="contrast">Clientes</a></li>
+                <li><a href="crudprofesional" role="button" class="contrast">Profesionales</a></li>
+                <li><a href="buscarClienteTurno.jsp" role="button" class="contrast">Turnos</a></li>
+            </ul>
+        </nav>
+    </main>
+
+    <footer>
+        <p>Veterinaria XYZ - Todos los derechos reservados</p>
+        <p>Contacto: 123-456-7890 | Email: contacto@veterinariaxyz.com</p>
+    </footer>
+</body>
+
+</html>
