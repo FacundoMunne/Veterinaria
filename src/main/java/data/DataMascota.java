@@ -58,18 +58,18 @@
 		    try {
 		        conn = DbConnector.getInstancia().getConn();
 		        stmt = conn.prepareStatement(query);
-		        stmt.setInt(1, clienteId);
+		        stmt.setInt(1, clienteId);  // Usamos el clienteId directamente
 		        rs = stmt.executeQuery();
 
 		        while (rs.next()) {
-		            Cliente cliente = new DataCliente().getById(rs.getInt("idCliente")); 
+		            // No es necesario obtener el cliente de nuevo, ya que lo tenemos en el servlet
 		            Mascota mascota = new Mascota(
 		                rs.getInt("idMascota"),
 		                rs.getString("nombre"),
 		                rs.getString("especie"),
 		                rs.getString("raza"),
 		                rs.getInt("edad"),
-		                cliente
+		                new Cliente(clienteId, null, null, null, null, null) // Pasamos el cliente directamente o con los datos disponibles
 		            );
 		            mascotas.add(mascota);
 		        }
@@ -86,6 +86,7 @@
 		    }
 		    return mascotas;
 		}
+
 
 
 		public void add(Mascota mascota) {

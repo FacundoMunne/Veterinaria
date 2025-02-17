@@ -7,13 +7,21 @@ public class Turno {
 		private Mascota mascota;
 		private Profesional profesional;
 		private LocalDateTime fechaHora;
+		private String estado;
 		
 		
 		
-		public Turno(Mascota mascota, Profesional profesional, LocalDateTime fechaHora) {
+		public Turno(Mascota mascota, Profesional profesional, LocalDateTime fechaHora, String estado) {
 			this.mascota = mascota;
 			this.profesional = profesional;
 			this.fechaHora = fechaHora;
+			this.estado= estado;
+		}
+		public String getEstado() {
+			return estado;
+		}
+		public void setEstado(String estado) {
+			this.estado = estado;
 		}
 		public Turno() {
 			// TODO Auto-generated constructor stub

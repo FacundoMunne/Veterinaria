@@ -49,9 +49,9 @@ public class crearTurno extends HttpServlet {
                 request.getRequestDispatcher("prueba.html").forward(request, response);
                 return ;
             }
-
+            String estado = "Programado";
             // Utilizar el constructor de Turno 
-            Turno turno = new Turno(mascota, profesional, fechaHora);
+            Turno turno = new Turno(mascota, profesional, fechaHora,estado);
 
             // Guardar el turno en la base de datos
             dataTurno.add(turno);

@@ -8,46 +8,49 @@ import clases.*;
 
 public class DataTurno {
 	
-	 public List<Turno> getAll() {
-		    List<Turno> turnos = new ArrayList<>();
-		    String query = "SELECT * FROM Turnos";
-		    Connection conn = null;
-		    PreparedStatement stmt = null;
-		    ResultSet rs = null;
+	public List<Turno> getAll() {
+	    List<Turno> turnos = new ArrayList<>();
+	    String query = "SELECT * FROM Turnos";
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+	    ResultSet rs = null;
 
-		    try {
-		        conn = DbConnector.getInstancia().getConn();
-		        stmt = conn.prepareStatement(query);
-		        rs = stmt.executeQuery();
+	    try {
+	        conn = DbConnector.getInstancia().getConn();
+	        stmt = conn.prepareStatement(query);
+	        rs = stmt.executeQuery();
 
-		        while (rs.next()) {
-		            DataProfesional dataProfesional = new DataProfesional();
-		            Profesional profesional = dataProfesional.getById(rs.getInt("idProfesional"));
+	        while (rs.next()) {
+	            DataProfesional dataProfesional = new DataProfesional();
+	            Profesional profesional = dataProfesional.getById(rs.getInt("idProfesional"));
 
-		            DataMascota dataMascota = new DataMascota();
-		            Mascota mascota = dataMascota.getById(rs.getInt("idMascota"));
+	            DataMascota dataMascota = new DataMascota();
+	            Mascota mascota = dataMascota.getById(rs.getInt("idMascota"));
 
-		            Turno turno = new Turno(
-		                mascota,
-		                profesional,
-		                rs.getTimestamp("fechaHora").toLocalDateTime()
-		            );
+	            // Crear Turno con estado
+	            Turno turno = new Turno(
+	                mascota,
+	                profesional,
+	                rs.getTimestamp("fechaHora").toLocalDateTime(),
+	                rs.getString("estado") // Aquí añadimos el estado
+	            );
 
-		            turnos.add(turno);
-		        }
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		    } finally {
-		        try {
-		            if (rs != null) rs.close();
-		            if (stmt != null) stmt.close();
-		            if (conn != null) DbConnector.getInstancia().releaseConn();
-		        } catch (SQLException e) {
-		            e.printStackTrace();
-		        }
-		    }
-		    return turnos;
-		}
+	            turnos.add(turno);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (stmt != null) stmt.close();
+	            if (conn != null) DbConnector.getInstancia().releaseConn();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return turnos;
+	}
+
 	 
 	 public Turno getById(int idMascota, int idProfesional) {
 		    String query = "SELECT fechaHora FROM Turnos WHERE idMascota = ? AND idProfesional = ?";
@@ -95,37 +98,28 @@ public class DataTurno {
 		    return turno;
 		}
 	 
+
+	 
 	    
 	 public void add(Turno turno) {
-		    String query = "INSERT INTO Turnos (fechaHora, idMascota, idProfesional) VALUES (?, ?, ?)";
+		    String query = "INSERT INTO Turnos (fechaHora, idMascota, idProfesional, estado) VALUES (?, ?, ?, ?)";
 		    Connection conn = null;
 		    PreparedStatement stmt = null;
 
 		    try {
 		        conn = DbConnector.getInstancia().getConn();
-		        if (conn == null) {
-		            System.out.println("La conexión es nula");
-		            return;
-		        }
-
 		        stmt = conn.prepareStatement(query);
 		        stmt.setTimestamp(1, Timestamp.valueOf(turno.getFechaHora()));
 		        stmt.setInt(2, turno.getMascota().getIdMascota());
 		        stmt.setInt(3, turno.getProfesional().getIdProfesional());
+		        stmt.setString(4, turno.getEstado()); // Aquí se agrega el estado
 
-		        System.out.println("Ejecutando query: " + stmt);
 		        int rowsInserted = stmt.executeUpdate();
-		        System.out.println("Filas insertadas: " + rowsInserted);
-
 		        if (rowsInserted > 0) {
 		            System.out.println("El turno se guardó correctamente.");
-		        } else {
-		            System.out.println("No se insertaron filas.");
 		        }
-
-		        conn.commit(); // Si auto-commit está desactivado
+		        conn.commit();
 		    } catch (SQLException e) {
-		        System.out.println("Error SQL: " + e.getMessage());
 		        e.printStackTrace();
 		    } finally {
 		        try {
@@ -139,7 +133,7 @@ public class DataTurno {
 
 
 	 public void edit(Turno turno) {
-		    String query = "UPDATE Turnos SET fechaHora = ?, idMascota = ?, idProfesional = ? WHERE fechaHora = ? AND idMascota = ? AND idProfesional = ?";
+		    String query = "UPDATE Turnos SET fechaHora = ?, idMascota = ?, idProfesional = ?, estado = ? WHERE fechaHora = ? AND idMascota = ? AND idProfesional = ?";
 		    Connection conn = null;
 		    PreparedStatement stmt = null;
 
@@ -149,9 +143,10 @@ public class DataTurno {
 		        stmt.setTimestamp(1, Timestamp.valueOf(turno.getFechaHora()));
 		        stmt.setInt(2, turno.getMascota().getIdMascota());
 		        stmt.setInt(3, turno.getProfesional().getIdProfesional());
-		        stmt.setTimestamp(4, Timestamp.valueOf(turno.getFechaHora())); // Parte de la clave primaria
-		        stmt.setInt(5, turno.getMascota().getIdMascota()); // Parte de la clave primaria
-		        stmt.setInt(6, turno.getProfesional().getIdProfesional()); // Parte de la clave primaria
+		        stmt.setString(4, turno.getEstado()); // Aquí se agrega el estado
+		        stmt.setTimestamp(5, Timestamp.valueOf(turno.getFechaHora()));
+		        stmt.setInt(6, turno.getMascota().getIdMascota());
+		        stmt.setInt(7, turno.getProfesional().getIdProfesional());
 		        stmt.executeUpdate();
 		    } catch (SQLException e) {
 		        e.printStackTrace();
@@ -164,6 +159,7 @@ public class DataTurno {
 		        }
 		    }
 		}
+
 
 
 	 public void remove(Turno turno) {
@@ -189,6 +185,7 @@ public class DataTurno {
 		        }
 		    }
 		}
+
 
 
 }

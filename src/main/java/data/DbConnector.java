@@ -10,7 +10,7 @@ package data;
 		private String host="localhost";
 		private String port="3306";
 		private String user="root";
-		private String password="Facundo92002";
+		private String password="facundo9";
 		private String db="veterinaria_java";
 		private int conectados=0;
 		private Connection conn=null;

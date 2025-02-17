@@ -15,6 +15,7 @@ import data.*;
 public class BuscarMascotas extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String dni = request.getParameter("dni");
+        System.out.println("DNI recibido: " + dni);
 
         // Obtener cliente y mascotas 
         DataCliente dataCliente = new DataCliente();
