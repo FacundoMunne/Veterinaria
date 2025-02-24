@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import clases.*;
 import data.*;
 
@@ -31,27 +32,34 @@ public class crearTurno extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-        	
             // Obtener los parámetros del formulario
             int idMascota = Integer.parseInt(request.getParameter("idMascota"));
-            System.out.print(idMascota);
             int idProfesional = Integer.parseInt(request.getParameter("idProfesional"));
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
             LocalDateTime fechaHora = LocalDateTime.parse(request.getParameter("fechaHora"), formatter);
 
-            // Buscar la Mascota y el Profesional 
+            // Buscar la Mascota y el Profesional
             Mascota mascota = dataMascota.getById(idMascota);
             Profesional profesional = dataProfesional.getById(idProfesional);
 
             // Verificar que no sean nulos
             if (mascota == null || profesional == null) {
                 request.setAttribute("errorMessage", "No se pudo encontrar la mascota o el profesional.");
-                request.getRequestDispatcher("prueba.html").forward(request, response);
-                return ;
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
             }
+
+            // Verificar disponibilidad del profesional en la fecha y hora
+            boolean disponible = dataTurno.isProfesionalAvailable(idProfesional, fechaHora);
+            if (!disponible) {
+                request.setAttribute("errorMessage", "El profesional no está disponible en la fecha y hora seleccionadas.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+
+            // Crear el turno
             String estado = "Programado";
-            // Utilizar el constructor de Turno 
-            Turno turno = new Turno(mascota, profesional, fechaHora,estado);
+            Turno turno = new Turno(mascota, profesional, fechaHora, estado);
 
             // Guardar el turno en la base de datos
             dataTurno.add(turno);
@@ -62,13 +70,7 @@ public class crearTurno extends HttpServlet {
         } catch (NumberFormatException | DateTimeParseException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Datos inválidos. Por favor, verifica los valores ingresados.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
-        } 
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
     }
-
 }
-
-
-
-
-

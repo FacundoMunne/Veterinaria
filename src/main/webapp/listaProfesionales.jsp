@@ -44,6 +44,8 @@
                     <td>
                         <a href="crudprofesional?action=edit&id=<%= profesional.getIdProfesional() %>" class="secondary">Editar</a>
                         <a href="crudprofesional?action=delete&id=<%= profesional.getIdProfesional() %>" class="contrast">Eliminar</a>
+						<a href="listaTurnosProfServlet?idProfesional=<%= profesional.getIdProfesional() %>" class="primary">Ver Turnos</a>
+                 
                     </td>
                 </tr>
                 <% 
