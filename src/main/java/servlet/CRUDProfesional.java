@@ -21,6 +21,8 @@ public class CRUDProfesional extends HttpServlet {
         super.init();
         dataProfesional = new DataProfesional(); 
     }
+    
+    
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -45,9 +47,9 @@ public class CRUDProfesional extends HttpServlet {
         } catch (Exception e) {
             throw new ServletException(e);
         }
-    }
+    }}
 
-    @Override
+    /*/  @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("idProfesional");
         String dni = request.getParameter("dni");
@@ -73,3 +75,4 @@ public class CRUDProfesional extends HttpServlet {
         }
     }
 }
+    /*/

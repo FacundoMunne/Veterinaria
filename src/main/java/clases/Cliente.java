@@ -2,6 +2,7 @@ package clases;
 
 public class Cliente {
 	private int idCliente;
+	private Usuario usuario;
 	private String dni;
     private String nombre;
     private String direccion;
@@ -9,14 +10,24 @@ public class Cliente {
     private String email;
 
     
-    public Cliente(int id,String dni,String nombre, String direccion, String telefono, String email) {
+    public Cliente(int id,Usuario usuario,String dni,String nombre, String direccion, String telefono, String email) {
     	this.idCliente = id;
+        this.usuario = usuario;
     	this.dni = dni;
         this.nombre = nombre;
         this.direccion = direccion;
         this.telefono = telefono;
         this.email = email;
         
+    }
+    
+    public Cliente(int id, String dni, String nombre, String direccion, String telefono, String email) {
+        this.idCliente = id;
+        this.dni = dni;
+        this.nombre = nombre;
+        this.direccion = direccion;
+        this.telefono = telefono;
+        this.email = email;
     }
     
     public Cliente() {
@@ -33,7 +44,14 @@ public class Cliente {
 	public void setIdCliente(int idCliente) {
 		this.idCliente = idCliente;
 	}
+	
+	public Usuario getUsuario() {
+        return usuario;
+    }
 
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 
 
 	public String getDni() {

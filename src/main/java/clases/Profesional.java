@@ -2,19 +2,25 @@ package clases;
 
 public class Profesional {
 	private int idProfesional;
+	private Usuario usuario;
 	private String dni;
 	private String nombre;
     private String especialidad;
     private String telefono;
     private String email;
     
-    public Profesional(int id,String dni, String nombre, String especialidad, String telefono, String email) {
+    public Profesional(int id,Usuario usuario,String dni, String nombre, String especialidad, String telefono, String email) {
         this.idProfesional = id;
+        this.usuario = usuario;
         this.dni=dni;
         this.nombre = nombre;
         this.especialidad = especialidad;
         this.telefono = telefono;
         this.email = email;
+    }
+    
+    public Profesional() {
+    	
     }
     
 	public int getIdProfesional() {
@@ -23,6 +29,15 @@ public class Profesional {
 	public void setIdProfesional(int idProfesional) {
 		this.idProfesional = idProfesional;
 	}
+	
+	 public Usuario getUsuario() {
+	        return usuario;
+	    }
+
+	 public void setUsuario(Usuario usuario) {
+	        this.usuario = usuario;
+	    }
+	
 	public String getDni() {
 		return dni;
 	}

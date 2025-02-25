@@ -69,7 +69,7 @@
 		                rs.getString("especie"),
 		                rs.getString("raza"),
 		                rs.getInt("edad"),
-		                new Cliente(clienteId, null, null, null, null, null) // Pasamos el cliente directamente o con los datos disponibles
+		                new Cliente(clienteId, null, null, null, null, null,null) // Pasamos el cliente directamente o con los datos disponibles
 		            );
 		            mascotas.add(mascota);
 		        }
@@ -96,20 +96,29 @@
 		    
 		    try {
 		        conn = DbConnector.getInstancia().getConn();
+		        System.out.println("Conexión a la base de datos establecida."); // Depuración
+
 		        stmt = conn.prepareStatement(query);
 		        stmt.setString(1, mascota.getNombre());
 		        stmt.setString(2, mascota.getEspecie());
 		        stmt.setString(3, mascota.getRaza());
 		        stmt.setInt(4, mascota.getEdad());
 		        stmt.setInt(5, mascota.getCliente().getIdCliente());
-		        stmt.executeUpdate();
+		        System.out.println(mascota.getCliente().getIdCliente());
+		        System.out.println("Insertando mascota: " + mascota.getNombre()); // Depuración
+		        int filasAfectadas = stmt.executeUpdate();
+		        System.out.println("Filas afectadas: " + filasAfectadas); // Depuración
+
 		    } catch (SQLException e) {
+		        System.out.println("Error al insertar mascota: " + e.getMessage()); // Depuración
 		        e.printStackTrace();
 		    } finally {
 		        try {
 		            if (stmt != null) stmt.close();
 		            if (conn != null) DbConnector.getInstancia().releaseConn();
+		            System.out.println("Recursos liberados."); // Depuración
 		        } catch (SQLException e) {
+		            System.out.println("Error al cerrar recursos: " + e.getMessage()); // Depuración
 		            e.printStackTrace();
 		        }
 		    }
