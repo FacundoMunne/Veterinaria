@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-	<%@ include file="header.jsp" %>
+	<%@ include file="../public/header.jsp" %>
     <header class="container">
         <h1>${turno == null ? "Agregar Turno" : "Editar Turno"}</h1>
     </header>
@@ -75,6 +75,6 @@
     <!-- Botón para volver a la lista de turnos -->
     <br>
     <a href="crudturno">Volver a la lista de turnos</a>
-     <%@ include file="footer.jsp" %>
+     <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

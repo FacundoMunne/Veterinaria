@@ -45,6 +45,6 @@ public class listaTurnos extends HttpServlet {
         request.setAttribute("listaClientes", listaClientes); 
 
         // Redirigir para mostrar los turnos
-        request.getRequestDispatcher("listaTurnos.jsp").forward(request, response);
+        request.getRequestDispatcher("/admin/listaTurnos.jsp").forward(request, response);
     }
 }

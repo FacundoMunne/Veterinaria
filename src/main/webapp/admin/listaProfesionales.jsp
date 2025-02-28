@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-<%@ include file="header.jsp" %>
+<%@ include file="../public/header.jsp" %>
 
     <header class="container">
         <h1>Lista de Profesionales</h1>
@@ -42,10 +42,9 @@
                     <td><%= profesional.getTelefono() %></td>
                     <td><%= profesional.getEmail() %></td>
                     <td>
-                        <a href="crudprofesional?action=edit&id=<%= profesional.getIdProfesional() %>" class="secondary">Editar</a>
-                        <a href="crudprofesional?action=delete&id=<%= profesional.getIdProfesional() %>" class="contrast">Eliminar</a>
-						<a href="listaTurnosProfServlet?idProfesional=<%= profesional.getIdProfesional() %>" class="primary">Ver Turnos</a>
-                 
+                        <a href="${pageContext.request.contextPath}/crudprofesional?action=edit&id=<%= profesional.getIdProfesional() %>" class="secondary">Editar</a>
+                        <a href="${pageContext.request.contextPath}/crudprofesional?action=delete&id=<%= profesional.getIdProfesional() %>" class="contrast">Eliminar</a>
+                        <a href="${pageContext.request.contextPath}/listaTurnosProfServlet?idProfesional=<%= profesional.getIdProfesional() %>" class="primary">Ver Turnos</a>
                     </td>
                 </tr>
                 <% 
@@ -60,9 +59,9 @@
                 %>
             </tbody>
         </table>
-        <a href="formProfesional.jsp" class="contrast">Agregar Nuevo Profesional</a>
+        <a href="${pageContext.request.contextPath}/admin/formProfesional.jsp" class="contrast">Agregar Nuevo Profesional</a>
     </main>
 
-    <%@ include file="footer.jsp" %>
+    <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

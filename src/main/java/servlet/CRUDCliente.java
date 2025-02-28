@@ -38,13 +38,13 @@ public class CRUDCliente extends HttpServlet {
 
                 // Pasar la lista de clientes al JSP
                 request.setAttribute("clientes", clientes);
-                request.getRequestDispatcher("listaClientes.jsp").forward(request, response);
+                request.getRequestDispatcher("/admin/listaClientes.jsp").forward(request, response);
             } else if (action.equals("edit")) {
                 // Editar cliente
                 int id = Integer.parseInt(request.getParameter("id"));
                 Cliente cliente = dataCliente.getById(id);
                 request.setAttribute("cliente", cliente);
-                request.getRequestDispatcher("formCliente.jsp").forward(request, response);
+                request.getRequestDispatcher("/admin/formCliente.jsp").forward(request, response);
             } else if (action.equals("delete")) {
                 // Eliminar cliente
                 int id = Integer.parseInt(request.getParameter("id"));

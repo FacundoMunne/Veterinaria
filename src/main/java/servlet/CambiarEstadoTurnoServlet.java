@@ -42,6 +42,6 @@ public class CambiarEstadoTurnoServlet extends HttpServlet {
         }
 
         // Redirigir de vuelta a la lista de turnos
-        response.sendRedirect("listaTurnosProfServlet?idProfesional=" + idProfesional);
+        response.sendRedirect("/public/listaTurnosProfServlet?idProfesional=" + idProfesional);
     }
 }

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-<%@ include file="header.jsp" %>
+<%@ include file="../public/header.jsp" %>
     <header class="container">
         <h1>Lista de Mascotas</h1>
     </header>
@@ -57,6 +57,6 @@
         </table>
         <a href="formMascota.jsp?clienteId=<%= request.getParameter("clienteId") %>" class="contrast">Agregar Nueva Mascota</a>
     </main>
-    <%@ include file="footer.jsp" %>
+    <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

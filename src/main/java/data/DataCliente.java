@@ -227,7 +227,7 @@ public class DataCliente {
 	}
 
 	public void edit(Cliente cliente) {
-	    String query = "UPDATE Cliente SET dni = ?, nombre = ?, direccion = ?, telefono = ?, email = ?, idUsuario = ? WHERE idCliente = ?";
+	    String query = "UPDATE Cliente SET dni = ?, nombre = ?, direccion = ?, telefono = ?, email = ?, idUsuario = ? WHERE id = ?";
 	    Connection conn = null;
 	    PreparedStatement stmt = null;
 	    
@@ -239,7 +239,7 @@ public class DataCliente {
 	        stmt.setString(3, cliente.getDireccion());
 	        stmt.setString(4, cliente.getTelefono());
 	        stmt.setString(5, cliente.getEmail());
-	        stmt.setInt(6, cliente.getUsuario().getIdUsuario()); // Agregar idUsuario
+	        stmt.setInt(6, cliente.getUsuario().getIdUsuario()); 
 	        stmt.setInt(7, cliente.getIdCliente());
 	        stmt.executeUpdate();
 	    } catch (SQLException e) {
@@ -253,7 +253,35 @@ public class DataCliente {
 	        }
 	    }
 	}
-
+	
+	public void editII(Cliente cliente) {
+	    String query = "UPDATE Cliente SET dni = ?, nombre = ?, direccion = ?, telefono = ?, email = ? WHERE id = ?";
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+	    
+	    try {
+	        conn = DbConnector.getInstancia().getConn();
+	        stmt = conn.prepareStatement(query);
+	        stmt.setString(1, cliente.getDni());
+	        stmt.setString(2, cliente.getNombre());
+	        stmt.setString(3, cliente.getDireccion());
+	        stmt.setString(4, cliente.getTelefono());
+	        stmt.setString(5, cliente.getEmail());
+	        stmt.setInt(6, cliente.getIdCliente()); 
+	        stmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (stmt != null) stmt.close();
+	            if (conn != null) DbConnector.getInstancia().releaseConn();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+	
+	
     public void remove(int id) {
         String query = "DELETE FROM Cliente WHERE id = ?";
         Connection conn = null;
@@ -310,7 +338,7 @@ public class DataCliente {
 
                 // Crear el objeto Cliente
                 cliente = new Cliente();
-                cliente.setIdCliente(rs.getInt("idCliente"));
+                cliente.setIdCliente(rs.getInt("id"));
                 cliente.setUsuario(usuario);
                 cliente.setDni(rs.getString("dni"));
                 cliente.setNombre(rs.getString("nombre"));

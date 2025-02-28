@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-	<%@ include file="header.jsp" %>
+	<%@ include file="../public/header.jsp" %>
     <h1>Turno Creado Exitosamente</h1>
     <a href="buscarClienteTurno.jsp">Volver a buscar cliente</a>
-    <%@ include file="footer.jsp" %>
+    <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

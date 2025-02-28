@@ -2,13 +2,11 @@ package servlet;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import clases.Turno;
 import data.DataTurno;
 
@@ -39,7 +37,7 @@ public class listaTurnosProf extends HttpServlet {
             if (idProfesionalStr == null || idProfesionalStr.isEmpty()) {
                 System.out.println("❌ ERROR: idProfesional es nulo o vacío.");
                 request.setAttribute("errorMessage", "ID de profesional no proporcionado.");
-                response.sendRedirect("error.jsp");
+                response.sendRedirect(request.getContextPath() + "/public/error.jsp");
                 return;
             }
 
@@ -68,19 +66,19 @@ public class listaTurnosProf extends HttpServlet {
             // Pasar datos al JSP
             request.setAttribute("turnos", turnos);
             request.setAttribute("idProfesional", idProfesional);
-            request.getRequestDispatcher("listaTurnosProf.jsp").forward(request, response);
+            request.getRequestDispatcher("/profesional/listaTurnosProf.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             System.out.println("❌ ERROR: idProfesional no es un número válido.");
             e.printStackTrace();
             request.setAttribute("errorMessage", "ID de profesional no válido.");
-            response.sendRedirect("error.jsp");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
 
         } catch (Exception e) {
             System.out.println("❌ ERROR GENERAL:");
             e.printStackTrace();
             request.setAttribute("errorMessage", e.getMessage());
-            response.sendRedirect("error.jsp");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
         }
     }
 }

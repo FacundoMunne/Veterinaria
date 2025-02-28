@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
- @WebServlet("/crudmascota")
+@WebServlet("/crudmascota")
 public class CRUDMascota extends HttpServlet {
     private DataCliente dataCliente = new DataCliente();
     private DataMascota dataMascota = new DataMascota();
@@ -40,7 +40,7 @@ public class CRUDMascota extends HttpServlet {
         Cliente cliente = dataCliente.getById(clienteId);
         if (cliente == null) {
             System.out.println("Error: No se encontró el cliente con ID " + clienteId); // Depuración
-            response.sendRedirect("error.jsp?mensaje=Cliente no encontrado");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp?mensaje=Cliente no encontrado");
             return;
         }
         System.out.println("Cliente encontrado: " + cliente.getNombre()); // Depuración
@@ -67,12 +67,12 @@ public class CRUDMascota extends HttpServlet {
             System.out.println("Mascota actualizada correctamente."); // Depuración
         } else {
             System.out.println("Acción no reconocida o ID no proporcionado."); // Depuración
-            response.sendRedirect("error.jsp?mensaje=Acción no válida");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp?mensaje=Acción no válida");
             return;
         }
 
         // Redirigir a la lista de mascotas del cliente
-        response.sendRedirect("crudmascota?action=list&clienteId=" + clienteId);
+        response.sendRedirect(request.getContextPath() + "/crudmascota?action=list&clienteId=" + clienteId);
     }
 
     @Override
@@ -92,11 +92,11 @@ public class CRUDMascota extends HttpServlet {
                 System.out.println("Número de mascotas encontradas: " + mascotas.size()); // Depuración
 
                 request.setAttribute("mascotas", mascotas);
-                request.getRequestDispatcher("listadoMascotas.jsp").forward(request, response);
+                request.getRequestDispatcher("/admin/listadoMascotas.jsp").forward(request, response);
             } catch (NumberFormatException e) {
                 System.out.println("Error al convertir clienteId a entero: " + e.getMessage()); // Depuración
                 e.printStackTrace();
-                response.sendRedirect("error.jsp");
+                response.sendRedirect(request.getContextPath() + "/public/error.jsp");
             }
         } else if ("delete".equals(action)) {
             try {
@@ -105,11 +105,11 @@ public class CRUDMascota extends HttpServlet {
                 System.out.println("Eliminando mascota ID: " + id + " del cliente ID: " + clienteId); // Depuración
 
                 dataMascota.remove(id);
-                response.sendRedirect("crudmascota?action=list&clienteId=" + clienteId);
+                response.sendRedirect(request.getContextPath() + "/crudmascota?action=list&clienteId=" + clienteId);
             } catch (NumberFormatException e) {
                 System.out.println("Error al convertir ID a entero: " + e.getMessage()); // Depuración
                 e.printStackTrace();
-                response.sendRedirect("error.jsp");
+                response.sendRedirect(request.getContextPath() + "/public/error.jsp");
             }
         } else if ("update".equals(action)) {
             try {
@@ -125,16 +125,15 @@ public class CRUDMascota extends HttpServlet {
 
                 request.setAttribute("mascota", mascota);
                 request.setAttribute("clientes", dataCliente.getAll());
-                request.getRequestDispatcher("formEditMascota.jsp").forward(request, response);
+                request.getRequestDispatcher("/admin/formEditMascota.jsp").forward(request, response);
             } catch (NumberFormatException e) {
                 System.out.println("Error al convertir ID a entero: " + e.getMessage()); // Depuración
                 e.printStackTrace();
-                response.sendRedirect("error.jsp");
+                response.sendRedirect(request.getContextPath() + "/public/error.jsp");
             }
         } else {
             System.out.println("Acción no reconocida: " + action); // Depuración
-            response.sendRedirect("error.jsp");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
         }
     }
-
-    }
+}

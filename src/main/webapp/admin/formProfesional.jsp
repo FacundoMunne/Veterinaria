@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-    <%@ include file="header.jsp" %>
+    <%@ include file="../public/header.jsp" %>
     
     <header class="container">
         <h1><%= request.getAttribute("profesional") != null && ((Profesional)request.getAttribute("profesional")).getIdProfesional() > 0 ? "Editar Profesional" : "Agregar Nuevo Profesional" %></h1>
@@ -19,6 +19,7 @@
             <% Profesional profesional = (Profesional) request.getAttribute("profesional"); %>
             <input type="hidden" name="idProfesional" value="<%= profesional != null ? profesional.getIdProfesional() : "" %>">
             
+            <!-- Datos del Profesional -->
             <label for="dni">DNI:</label>
             <input type="text" id="dni" name="dni" value="<%= profesional != null ? profesional.getDni() : "" %>" placeholder="Ingrese el DNI" required>
             
@@ -34,10 +35,17 @@
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" value="<%= profesional != null ? profesional.getEmail() : "" %>" placeholder="Ingrese el email" required>
             
+            <!-- Datos del Usuario -->
+            <label for="nombreUsuario">Nombre de Usuario:</label>
+            <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Ingrese el nombre de usuario" required>
+            
+            <label for="contraseña">Contraseña:</label>
+            <input type="password" id="contraseña" name="contraseña" placeholder="Ingrese la contraseña" required>
+            
             <button type="submit" class="contrast">Guardar Profesional</button>
         </form>
     </main>
 
-    <%@ include file="footer.jsp" %>
+    <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

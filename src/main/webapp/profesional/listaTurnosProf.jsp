@@ -1,4 +1,4 @@
-<%@ include file="header.jsp" %>
+<%@ include file="../public/header.jsp" %>
 <%@ page import="java.util.List" %>
 <%@ page import="clases.Turno" %>
 <%@ page import="java.text.SimpleDateFormat" %>
@@ -15,7 +15,7 @@
 <main class="container">
     <h1>Turnos del Profesional</h1>
     
-    <form method="get" action="listaTurnosProfServlet">
+    <form method="get" action="${pageContext.request.contextPath}/listaTurnosProfServlet">
         <input type="hidden" name="idProfesional" value="${idProfesional}">
         
         <label for="estado">Estado:</label>
@@ -61,12 +61,12 @@
                            <td><%= turno.getMascota().getNombre() %></td>
                            <td><%= turno.getEstado() %></td>
                            <td>
-                               <form method="post" action="cambiarEstadoTurnoServlet" style="display: inline;">
+                               <form method="post" action="${pageContext.request.contextPath}/cambiarEstadoTurnoServlet" style="display: inline;">
                                    <input type="hidden" name="idMascota" value="<%= turno.getMascota().getIdMascota() %>">
                                    <input type="hidden" name="idProfesional" value="<%= turno.getProfesional().getIdProfesional() %>">
                                    <input type="hidden" name="fechaHora" value="<%= turno.getFechaHora() %>">
                                    <button type="submit" name="accion" value="Recepcionado" <%= !"Programado".equals(turno.getEstado()) ? "disabled" : "" %>>Recepcionar</button>
-									<button type="submit" name="accion" value="Cancelado" <%= !"Programado".equals(turno.getEstado()) ? "disabled" : "" %>>Cancelar</button>
+                                   <button type="submit" name="accion" value="Cancelado" <%= !"Programado".equals(turno.getEstado()) ? "disabled" : "" %>>Cancelar</button>
                                </form>
                            </td>
                        </tr>
@@ -78,4 +78,4 @@
     </table>
 </main>
 
-<%@ include file="footer.jsp" %>
+<%@ include file="../public/footer.jsp" %>

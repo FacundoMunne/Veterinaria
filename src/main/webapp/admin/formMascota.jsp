@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-<%@ include file="header.jsp" %>
+<%@ include file="../public/header.jsp" %>
     <header class="container">
         <h1>Formulario de Mascota</h1>
         <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
@@ -64,6 +64,6 @@
             <button type="submit" class="contrast">Guardar</button>
         </form>
     </main>
-    <%@ include file="footer.jsp" %>
+    <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

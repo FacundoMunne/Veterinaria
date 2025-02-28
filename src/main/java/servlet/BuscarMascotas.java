@@ -32,11 +32,11 @@ public class BuscarMascotas extends HttpServlet {
             request.setAttribute("mascotas", mascotas);
             request.setAttribute("profesionales", profesionales);
             
-            RequestDispatcher dispatcher = request.getRequestDispatcher("seleccionarTurno.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/seleccionarTurno.jsp");
             dispatcher.forward(request, response);
         } else {
             request.setAttribute("error", "Cliente no encontrado");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/public/error.jsp");
             dispatcher.forward(request, response);
         }
     }

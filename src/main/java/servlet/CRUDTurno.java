@@ -35,7 +35,7 @@ public class CRUDTurno extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "No se pudo eliminar el turno.");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
         }
     }
 }

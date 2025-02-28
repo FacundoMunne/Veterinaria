@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-	<%@ include file="header.jsp" %>
+	<%@ include file="../public/header.jsp" %>
     <h1>Seleccionar Turno</h1>
     <form action="crearTurno" method="post">
         <h2>Cliente: ${cliente.nombre}</h2>
@@ -63,6 +63,6 @@
 
         <input type="submit" value="Crear Turno">
     </form>
-     <%@ include file="footer.jsp" %>
+     <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

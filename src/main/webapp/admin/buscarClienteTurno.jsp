@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-	    <%@ include file="header.jsp" %>
+	    <%@ include file="../public/header.jsp" %>
 	<header class="container">
 		<h1>Turnos</h1>    
 	</header>
@@ -22,6 +22,6 @@
    		 <a href="listaTurnos" role="button" class="contrast" style="margin: 0;">Lista de turnos</a>
    	</div>
     </main>
-    <%@ include file="footer.jsp" %>
+    <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

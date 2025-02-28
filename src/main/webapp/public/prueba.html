@@ -49,14 +49,17 @@
 <body>
     <header>
         <h1>Veterinaria</h1>
+        <a href="${pageContext.request.contextPath}/logout">Cerrar Sesión</a>
     </header>
 
     <main>
         <nav>
             <ul>
-                <li><a href="crudcliente" role="button" class="contrast">Clientes</a></li>
-                <li><a href="listaProfesionales" role="button" class="contrast">Profesionales</a></li>
-                <li><a href="buscarClienteTurno.jsp" role="button" class="contrast">Turnos</a></li>
+                <li><a href="/Veterinaria/crudcliente" role="button" class="contrast">Clientes</a></li>
+                <li><a href="/Veterinaria/crudprofesional" role="button" class="contrast">Profesionales</a></li>
+                <li><a href="/Veterinaria/admin/buscarClienteTurno.jsp" role="button" class="contrast">Turnos</a></li>
+                               
+             
             </ul>
         </nav>
     </main>

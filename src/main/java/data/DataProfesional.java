@@ -16,7 +16,7 @@ public class DataProfesional {
 	                   "FROM Profesional p " +
 	                   "JOIN Usuarios u ON p.idUsuario = u.idUsuario " +
 	                   "JOIN Roles r ON u.idRol = r.idRol " +
-	                   "WHERE p.idProfesional = ?";
+	                   "WHERE p.id = ?";
 	    Profesional profesional = null;
 	    Connection conn = null;
 	    PreparedStatement stmt = null;
@@ -45,7 +45,7 @@ public class DataProfesional {
 
 	            // Crear el objeto Profesional
 	            profesional = new Profesional();
-	            profesional.setIdProfesional(rs.getInt("idProfesional"));
+	            profesional.setIdProfesional(rs.getInt("id"));
 	            profesional.setUsuario(usuario);
 	            profesional.setDni(rs.getString("dni"));
 	            profesional.setNombre(rs.getString("nombre"));
@@ -99,7 +99,7 @@ public class DataProfesional {
 
 	            // Crear el objeto Profesional
 	            Profesional profesional = new Profesional();
-	            profesional.setIdProfesional(rs.getInt("idProfesional"));
+	            profesional.setIdProfesional(rs.getInt("id"));
 	            profesional.setUsuario(usuario);
 	            profesional.setDni(rs.getString("dni"));
 	            profesional.setNombre(rs.getString("nombre"));
@@ -124,28 +124,90 @@ public class DataProfesional {
 	    return profesionales;
 	}
 
-	public void add(Profesional profesional) {
-	    String query = "INSERT INTO Profesional (dni, nombre, especialidad, telefono, email, idUsuario) VALUES (?, ?, ?, ?, ?, ?)";
+	public void add(Profesional profesional, Usuario usuario) {
 	    Connection conn = null;
-	    PreparedStatement stmt = null;
-	    
+	    PreparedStatement stmtUsuario = null;
+	    PreparedStatement stmtProfesional = null;
+
 	    try {
+	        // Obtener la conexión a la base de datos
 	        conn = DbConnector.getInstancia().getConn();
-	        stmt = conn.prepareStatement(query);
-	        stmt.setString(1, profesional.getDni());
-	        stmt.setString(2, profesional.getNombre());
-	        stmt.setString(3, profesional.getEspecialidad());
-	        stmt.setString(4, profesional.getTelefono());
-	        stmt.setString(5, profesional.getEmail());
-	        stmt.setInt(6, profesional.getUsuario().getIdUsuario()); // Agregar idUsuario
-	        stmt.executeUpdate();
+	        System.out.println("Conexión a la base de datos establecida."); // Depuración
+
+	        // Desactivar el autocommit para manejar la transacción manualmente
+	        conn.setAutoCommit(false);
+	        System.out.println("Autocommit desactivado."); // Depuración
+
+	        // 1. Insertar el Usuario
+	        String queryUsuario = "INSERT INTO Usuarios (nombreUsuario, contraseña, idRol) VALUES (?, ?, ?)";
+	        stmtUsuario = conn.prepareStatement(queryUsuario, Statement.RETURN_GENERATED_KEYS);
+	        stmtUsuario.setString(1, usuario.getNombreUsuario());
+	        stmtUsuario.setString(2, usuario.getContraseña()); // La contraseña ya debe estar hasheada
+	        stmtUsuario.setInt(3, usuario.getRol().getIdRol()); // Asignar el rol (idRol = 2 para Profesional)
+
+	        System.out.println("Ejecutando inserción de Usuario..."); // Depuración
+	        int filasUsuario = stmtUsuario.executeUpdate();
+	        System.out.println("Filas afectadas en Usuario: " + filasUsuario); // Depuración
+
+	        // Obtener el ID generado para el Usuario
+	        ResultSet rs = stmtUsuario.getGeneratedKeys();
+	        int idUsuario = 0;
+	        if (rs.next()) {
+	            idUsuario = rs.getInt(1);
+	            System.out.println("Usuario insertado con ID: " + idUsuario); // Depuración
+	        } else {
+	            System.out.println("Error: No se pudo obtener el ID del Usuario."); // Depuración
+	            throw new SQLException("No se pudo obtener el ID del Usuario.");
+	        }
+
+	        // 2. Asignar el Usuario al Profesional
+	        usuario.setIdUsuario(idUsuario); // Asignar el ID generado al objeto Usuario
+	        profesional.setUsuario(usuario); // Asignar el Usuario al Profesional
+	        System.out.println("Usuario asignado al Profesional."); // Depuración
+
+	        // 3. Insertar el Profesional
+	        String queryProfesional = "INSERT INTO Profesional (dni, nombre, especialidad, telefono, email, idUsuario) VALUES (?, ?, ?, ?, ?, ?)";
+	        stmtProfesional = conn.prepareStatement(queryProfesional);
+	        stmtProfesional.setString(1, profesional.getDni());
+	        stmtProfesional.setString(2, profesional.getNombre());
+	        stmtProfesional.setString(3, profesional.getEspecialidad());
+	        stmtProfesional.setString(4, profesional.getTelefono());
+	        stmtProfesional.setString(5, profesional.getEmail());
+	        stmtProfesional.setInt(6, idUsuario); // Asignar el idUsuario generado
+
+	        System.out.println("Ejecutando inserción de Profesional..."); // Depuración
+	        int filasProfesional = stmtProfesional.executeUpdate();
+	        System.out.println("Filas afectadas en Profesional: " + filasProfesional); // Depuración
+
+	        // Confirmar la transacción
+	        conn.commit();
+	        System.out.println("Transacción completada: Usuario y Profesional insertados correctamente."); // Depuración
+
 	    } catch (SQLException e) {
+	        System.out.println("Error en la transacción: " + e.getMessage()); // Depuración
 	        e.printStackTrace();
+	        // Revertir la transacción en caso de error
+	        if (conn != null) {
+	            try {
+	                conn.rollback();
+	                System.out.println("Transacción revertida debido a un error."); // Depuración
+	            } catch (SQLException ex) {
+	                System.out.println("Error al revertir la transacción: " + ex.getMessage()); // Depuración
+	                ex.printStackTrace();
+	            }
+	        }
 	    } finally {
+	        // Cerrar recursos y restaurar el autocommit
 	        try {
-	            if (stmt != null) stmt.close();
-	            if (conn != null) DbConnector.getInstancia().releaseConn();
+	            if (stmtUsuario != null) stmtUsuario.close();
+	            if (stmtProfesional != null) stmtProfesional.close();
+	            if (conn != null) {
+	                conn.setAutoCommit(true); // Restaurar el autocommit
+	                DbConnector.getInstancia().releaseConn();
+	                System.out.println("Recursos liberados y autocommit restaurado."); // Depuración
+	            }
 	        } catch (SQLException e) {
+	            System.out.println("Error al cerrar recursos: " + e.getMessage()); // Depuración
 	            e.printStackTrace();
 	        }
 	    }

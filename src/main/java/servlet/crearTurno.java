@@ -45,7 +45,7 @@ public class crearTurno extends HttpServlet {
             // Verificar que no sean nulos
             if (mascota == null || profesional == null) {
                 request.setAttribute("errorMessage", "No se pudo encontrar la mascota o el profesional.");
-                request.getRequestDispatcher("error.jsp").forward(request, response);
+                request.getRequestDispatcher("/public/error.jsp").forward(request, response);
                 return;
             }
 
@@ -53,7 +53,7 @@ public class crearTurno extends HttpServlet {
             boolean disponible = dataTurno.isProfesionalAvailable(idProfesional, fechaHora);
             if (!disponible) {
                 request.setAttribute("errorMessage", "El profesional no está disponible en la fecha y hora seleccionadas.");
-                request.getRequestDispatcher("error.jsp").forward(request, response);
+                request.getRequestDispatcher("/public/error.jsp").forward(request, response);
                 return;
             }
 
@@ -65,12 +65,12 @@ public class crearTurno extends HttpServlet {
             dataTurno.add(turno);
 
             // Redirigir a la página de confirmación
-            response.sendRedirect("turnosConfirmados.jsp");
+            response.sendRedirect("/admin/turnosConfirmados.jsp");
 
         } catch (NumberFormatException | DateTimeParseException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Datos inválidos. Por favor, verifica los valores ingresados.");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
         }
     }
 }

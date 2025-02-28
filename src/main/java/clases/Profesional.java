@@ -19,6 +19,15 @@ public class Profesional {
         this.email = email;
     }
     
+    public Profesional(int id,String dni, String nombre, String especialidad, String telefono, String email) {
+        this.idProfesional = id;
+        this.dni=dni;
+        this.nombre = nombre;
+        this.especialidad = especialidad;
+        this.telefono = telefono;
+        this.email = email;
+    }
+    
     public Profesional() {
     	
     }

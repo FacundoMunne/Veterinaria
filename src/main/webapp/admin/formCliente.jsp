@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-    <%@ include file="header.jsp" %>
+    <%@ include file="../public/header.jsp" %>
     <header class="container">
         <h1><%= request.getAttribute("cliente") != null && ((Cliente)request.getAttribute("cliente")).getIdCliente() > 0 ? "Editar Cliente" : "Agregar Nuevo Cliente" %></h1>
     </header>
@@ -44,6 +44,6 @@
             <button type="submit" class="contrast">Guardar Cliente</button>
         </form>
     </main>
-    <%@ include file="footer.jsp" %>
+    <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

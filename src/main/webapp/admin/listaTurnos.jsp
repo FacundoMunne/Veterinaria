@@ -7,7 +7,7 @@
      <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
 </head>
 <body>
-<%@ include file="header.jsp" %>
+<%@ include file="../public/header.jsp" %>
     <header class="container">
         <h1>Turnos Actuales</h1>
     </header>
@@ -53,6 +53,6 @@
     </table>
 </main>
     <a href="buscarClienteTurno.jsp">Agregar nuevo Turno</a>
-	<%@ include file="footer.jsp" %>
+	<%@ include file="../public/footer.jsp" %>
 </body>
 </html>
