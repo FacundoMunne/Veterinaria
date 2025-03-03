@@ -3,6 +3,9 @@ import java.sql.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 import clases.Usuario;
 import clases.Rol;
 
@@ -146,6 +149,41 @@ public class DataUsuario {
 
         return exito;
     }
+	
+	public void actualizarUsuario(Usuario usuario) {
+	    String query = "UPDATE Usuarios SET nombreUsuario = ?, contraseña = ? WHERE idUsuario = ?";
+	    Connection conn = null;
+	    PreparedStatement stmt = null;
+
+	    try {
+	        conn = DbConnector.getInstancia().getConn();
+	        stmt = conn.prepareStatement(query);
+	        stmt.setString(1, usuario.getNombreUsuario());
+
+	        // Hashear la contraseña antes de guardarla
+	        String contraseñaHasheada = BCrypt.hashpw(usuario.getContraseña(), BCrypt.gensalt());
+	        stmt.setString(2, contraseñaHasheada);
+
+	        stmt.setInt(3, usuario.getIdUsuario());
+	        int rowsUpdated = stmt.executeUpdate();
+
+	        // Depuración: Verificar si la actualización fue exitosa
+	        if (rowsUpdated > 0) {
+	            System.out.println("Usuario actualizado correctamente.");
+	        } else {
+	            System.out.println("No se encontró el usuario con ID: " + usuario.getIdUsuario());
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (stmt != null) stmt.close();
+	            if (conn != null) DbConnector.getInstancia().releaseConn();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
 }
 
 

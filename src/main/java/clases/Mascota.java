@@ -26,6 +26,13 @@ public class Mascota {
 	        this.edad = edad;
 	        this.cliente = cliente;
 	    }
+	    
+	    
+		public Mascota() {
+			// TODO Auto-generated constructor stub
+		}
+
+
 		public String getNombre() {
 			return nombre;
 		}

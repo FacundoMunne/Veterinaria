@@ -76,9 +76,9 @@
                     <%-- Menú para clientes --%>
                     <c:if test="${sessionScope.rol eq 'Cliente'}">
                         <li><a href="${pageContext.request.contextPath}/cliente/informacionPersonal.jsp">Información Personal</a></li>
-                        <li><a href="${pageContext.request.contextPath}/cliente/misMascotas.jsp">Mis Mascotas</a></li>
-                        <li><a href="${pageContext.request.contextPath}/cliente/misTurnos.jsp">Mis Turnos</a></li>
-                        <li><a href="${pageContext.request.contextPath}/cliente/ajustes.jsp">Ajustes</a></li>
+<li><a href="${pageContext.request.contextPath}/listarMascotas" class="button">Mis Mascotas</a></li>                        
+<li><a href="${pageContext.request.contextPath}/listarTurnos">Mis Turnos</a></li>
+                        <li><a href="${pageContext.request.contextPath}/cliente/ajustesCliente.jsp">Ajustes</a></li>
                     </c:if>
 
                     <%-- Menú para profesionales --%>

@@ -345,4 +345,55 @@ public class DataTurno {
 		        }
 		    }
 		}
+
+
+	 public List<Turno> getByClienteId(int idCliente) {
+		    List<Turno> turnos = new ArrayList<>();
+		    String query = "SELECT t.*, m.nombre AS nombreMascota, p.nombre AS nombreProfesional " +
+		                   "FROM Turnos t " +
+		                   "JOIN Mascotas m ON t.idMascota = m.idMascota " +
+		                   "JOIN Profesional p ON t.idProfesional = p.id " +
+		                   "WHERE m.idCliente = ? AND t.fechaHora >= NOW() AND t.estado = 'Programado'";
+		    Connection conn = null;
+		    PreparedStatement stmt = null;
+		    ResultSet rs = null;
+
+		    try {
+		        conn = DbConnector.getInstancia().getConn();
+		        stmt = conn.prepareStatement(query);
+		        stmt.setInt(1, idCliente);
+		        rs = stmt.executeQuery();
+
+		        while (rs.next()) {
+		            // Crear objetos Mascota y Profesional
+		            DataMascota dataMascota = new DataMascota();
+		            Mascota mascota = dataMascota.getById(rs.getInt("idMascota"));
+
+		            DataProfesional dataProfesional = new DataProfesional();
+		           Profesional profesional = dataProfesional.getById((rs.getInt("idProfesional")));
+
+		            // Crear objeto Turno
+		            Turno turno = new Turno();
+		            turno.setMascota(mascota);
+		            turno.setProfesional(profesional);
+		            turno.setFechaHora(rs.getObject("fechaHora", LocalDateTime.class));
+		            turno.setEstado(rs.getString("estado"));
+
+		            // Agregar el turno a la lista
+		            turnos.add(turno);
+		        }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		        try {
+		            if (rs != null) rs.close();
+		            if (stmt != null) stmt.close();
+		            if (conn != null) DbConnector.getInstancia().releaseConn();
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+		    }
+
+		    return turnos;
+		}
 }
