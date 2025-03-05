@@ -83,10 +83,10 @@
 
                     <%-- Menú para profesionales --%>
                     <c:if test="${sessionScope.rol eq 'Profesional'}">
-                        <li><a href="${pageContext.request.contextPath}/profesional/informacionPersonal.jsp">Información Personal</a></li>
-                        <li><a href="${pageContext.request.contextPath}/profesional/proximosTurnos.jsp">Próximos Turnos</a></li>
-                        <li><a href="${pageContext.request.contextPath}/profesional/infoMascotas.jsp">Información de Mascotas</a></li>
-                        <li><a href="${pageContext.request.contextPath}/profesional/ajustes.jsp">Ajustes</a></li>
+                        <li><a href="${pageContext.request.contextPath}/profesional/informacionPersonalProf.jsp">Información Personal</a></li>
+                        <li><a href="${pageContext.request.contextPath}/listaTurnosProfServlet">Próximos Turnos</a></li>
+                        <li><a href="${pageContext.request.contextPath}/listaMascotasProfServlet">Información de Mascotas</a></li>
+                        <li><a href="${pageContext.request.contextPath}/profesional/ajustesProfesional.jsp">Ajustes</a></li>
                     </c:if>
 
                     <%-- Menú para administradores --%>

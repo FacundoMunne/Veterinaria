@@ -396,4 +396,98 @@ public class DataTurno {
 
 		    return turnos;
 		}
+	 
+	 
+	 public List<Mascota> getMascotasByProfesional(int idProfesional) {
+		    List<Mascota> mascotas = new ArrayList<>();
+		    String query = "SELECT DISTINCT m.* FROM Mascotas m " +
+		                   "JOIN Turnos t ON m.idMascota = t.idMascota " +
+		                   "WHERE t.idProfesional = ?";
+		    Connection conn = null;
+		    PreparedStatement stmt = null;
+		    ResultSet rs = null;
+
+		    try {
+		        conn = DbConnector.getInstancia().getConn();
+		        stmt = conn.prepareStatement(query);
+		        stmt.setInt(1, idProfesional);
+		        rs = stmt.executeQuery();
+
+		        while (rs.next()) {
+		            Mascota mascota = new Mascota();
+		            mascota.setIdMascota(rs.getInt("idMascota"));
+		            mascota.setNombre(rs.getString("nombre"));
+		            mascota.setEspecie(rs.getString("especie"));
+		            mascota.setRaza(rs.getString("raza"));
+		            mascota.setEdad(rs.getInt("edad"));
+		            mascotas.add(mascota);
+		        }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		        try {
+		            if (rs != null) rs.close();
+		            if (stmt != null) stmt.close();
+		            if (conn != null) DbConnector.getInstancia().releaseConn();
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+		    }
+
+		    return mascotas;
+		}
+	 
+	 public List<Turno> getHistorialTurnosByMascotaAndProfesional(int idMascota, int idProfesional) {
+		    List<Turno> turnos = new ArrayList<>();
+		    String query = "SELECT t.*, m.nombre AS nombreMascota, p.nombre AS nombreProfesional " +
+		                   "FROM Turnos t " +
+		                   "JOIN Mascotas m ON t.idMascota = m.idMascota " +
+		                   "JOIN Profesional p ON t.idProfesional = p.id " +
+		                   "WHERE t.idMascota = ? AND t.idProfesional = ? " +
+		                   "ORDER BY t.fechaHora DESC";
+		    Connection conn = null;
+		    PreparedStatement stmt = null;
+		    ResultSet rs = null;
+
+		    try {
+		        conn = DbConnector.getInstancia().getConn();
+		        stmt = conn.prepareStatement(query);
+		        stmt.setInt(1, idMascota);
+		        stmt.setInt(2, idProfesional);
+		        rs = stmt.executeQuery();
+
+		        while (rs.next()) {
+		            // Crear objetos Mascota y Profesional
+		            Mascota mascota = new Mascota();
+		            mascota.setIdMascota(rs.getInt("idMascota"));
+		            mascota.setNombre(rs.getString("nombreMascota"));
+
+		            Profesional profesional = new Profesional();
+		            profesional.setIdProfesional(rs.getInt("idProfesional"));
+		            profesional.setNombre(rs.getString("nombreProfesional"));
+
+		            // Crear objeto Turno
+		            Turno turno = new Turno();
+		            turno.setMascota(mascota);
+		            turno.setProfesional(profesional);
+		            turno.setFechaHora(rs.getTimestamp("fechaHora").toLocalDateTime());
+		            turno.setEstado(rs.getString("estado"));
+
+		            // Agregar el turno a la lista
+		            turnos.add(turno);
+		        }
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		        try {
+		            if (rs != null) rs.close();
+		            if (stmt != null) stmt.close();
+		            if (conn != null) DbConnector.getInstancia().releaseConn();
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        }
+		    }
+
+		    return turnos;
+		}
 }

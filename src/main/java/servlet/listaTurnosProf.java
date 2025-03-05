@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import clases.Turno;
 import data.DataTurno;
 
@@ -23,34 +24,31 @@ public class listaTurnosProf extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // 📌 DEBUG: Verificar parámetros recibidos
-            String idProfesionalStr = request.getParameter("idProfesional");
-            String estado = request.getParameter("estado");
-            String orden = request.getParameter("orden");
+            // Obtener la sesión actual
+            HttpSession session = request.getSession(false);
 
-            System.out.println("DEBUG: Parámetros recibidos en la URL:");
-            System.out.println("idProfesional: " + idProfesionalStr);
-            System.out.println("estado: " + estado);
-            System.out.println("orden: " + orden);
-
-            // Si no hay idProfesional, mandar a error
-            if (idProfesionalStr == null || idProfesionalStr.isEmpty()) {
-                System.out.println("❌ ERROR: idProfesional es nulo o vacío.");
-                request.setAttribute("errorMessage", "ID de profesional no proporcionado.");
+            // Verificar si la sesión existe y si contiene el idProfesional
+            if (session == null || session.getAttribute("idProfesional") == null) {
+                System.out.println("❌ ERROR: No hay sesión o el idProfesional no está en la sesión.");
+                request.setAttribute("errorMessage", "Debes iniciar sesión para acceder a esta página.");
                 response.sendRedirect(request.getContextPath() + "/public/error.jsp");
                 return;
             }
 
-            // Convertir idProfesional a int
-            int idProfesional = Integer.parseInt(idProfesionalStr);
+            // Obtener el idProfesional desde la sesión
+            int idProfesional = (int) session.getAttribute("idProfesional");
+
+            // Obtener parámetros adicionales (estado y orden) desde la solicitud
+            String estado = request.getParameter("estado");
+            String orden = request.getParameter("orden");
+
+            // 📌 DEBUG: Verificar valores obtenidos
+            System.out.println("✅ ID Profesional obtenido de la sesión: " + idProfesional);
+            System.out.println("✅ Estado: " + (estado != null ? estado : "No especificado"));
+            System.out.println("✅ Orden: " + (orden != null ? orden : "No especificado"));
 
             // Determinar orden ascendente o descendente
             boolean ordenAscendente = orden == null || orden.equalsIgnoreCase("asc");
-
-            // 📌 DEBUG: Verificando valores antes de la consulta
-            System.out.println("✅ ID Profesional convertido: " + idProfesional);
-            System.out.println("✅ Estado: " + (estado != null ? estado : "No especificado"));
-            System.out.println("✅ Orden Ascendente: " + ordenAscendente);
 
             // Obtener turnos desde la BD
             List<Turno> turnos = dataTurno.getTurnosByProfesional(idProfesional, estado, ordenAscendente);
@@ -67,12 +65,6 @@ public class listaTurnosProf extends HttpServlet {
             request.setAttribute("turnos", turnos);
             request.setAttribute("idProfesional", idProfesional);
             request.getRequestDispatcher("/profesional/listaTurnosProf.jsp").forward(request, response);
-
-        } catch (NumberFormatException e) {
-            System.out.println("❌ ERROR: idProfesional no es un número válido.");
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "ID de profesional no válido.");
-            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
 
         } catch (Exception e) {
             System.out.println("❌ ERROR GENERAL:");

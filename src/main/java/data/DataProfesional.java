@@ -262,4 +262,35 @@ public class DataProfesional {
             }
         }
     }
+
+    public void editII(Profesional profesional) {
+        String query = "UPDATE Profesional SET dni = ?, nombre = ?, especialidad = ?, telefono = ?, email = ? WHERE id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            conn = DbConnector.getInstancia().getConn(); // Obtener la conexión a la base de datos
+            stmt = conn.prepareStatement(query);
+            
+            // Asignar los valores del profesional a los parámetros del PreparedStatement
+            stmt.setString(1, profesional.getDni());
+            stmt.setString(2, profesional.getNombre());
+            stmt.setString(3, profesional.getEspecialidad());
+            stmt.setString(4, profesional.getTelefono());
+            stmt.setString(5, profesional.getEmail());
+            stmt.setInt(6, profesional.getIdProfesional()); // ID del profesional
+            
+            stmt.executeUpdate(); // Ejecutar la actualización
+        } catch (SQLException e) {
+            e.printStackTrace(); // Manejar excepciones
+        } finally {
+            try {
+                // Cerrar recursos
+                if (stmt != null) stmt.close();
+                if (conn != null) DbConnector.getInstancia().releaseConn();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

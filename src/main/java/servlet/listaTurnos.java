@@ -30,8 +30,8 @@ public class listaTurnos extends HttpServlet {
         // Para cada turnola mascota y el profesional relacionados
         for (Turno turno : listaTurnos) {
             Mascota mascota = dataMascota.getById(turno.getMascota().getIdMascota());
+            System.out.println(mascota);
             Cliente cliente = dataCliente.getById(mascota.getCliente().getIdCliente()); 
-            listaClientes.add(cliente);
             Profesional profesional = dataProfesional.getById(turno.getProfesional().getIdProfesional());
             LocalDateTime fecha = turno.getFechaHora();
 
