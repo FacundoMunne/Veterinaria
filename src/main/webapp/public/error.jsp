@@ -18,7 +18,7 @@
             <blockquote>
                 ${errorMessage}
             </blockquote>
-            <a href="prueba.html" role="button" class="secondary">Volver al formulario de turnos</a>
+            <a href="${pageContext.request.contextPath}/public/login.jsp" role="button" class="secondary">Volver al inicio</a>
         </section>
     </main>
     <%@ include file="footer.jsp" %>

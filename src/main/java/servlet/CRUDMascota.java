@@ -10,6 +10,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -20,6 +22,17 @@ public class CRUDMascota extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Verificar si el usuario está autenticado
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("usuario") == null) {
+            response.sendRedirect(request.getContextPath() + "/public/login.jsp");
+            return;
+        }
+
+        // Obtener el rol del usuario desde la sesión
+        String rol = (String) session.getAttribute("rol");
+
+        // Procesar la acción
         String action = request.getParameter("action");
         String idParam = request.getParameter("id");
         String nombre = request.getParameter("nombre");
@@ -71,12 +84,26 @@ public class CRUDMascota extends HttpServlet {
             return;
         }
 
-        // Redirigir a la lista de mascotas del cliente
-        response.sendRedirect(request.getContextPath() + "/crudmascota?action=list&clienteId=" + clienteId);
+        // Redirigir según el rol del usuario
+        if ("Cliente".equals(rol)) {
+            response.sendRedirect(request.getContextPath() + "listarMascotas");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/crudmascota?action=list&clienteId=" + clienteId);
+        }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Verificar si el usuario está autenticado
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("usuario") == null) {
+            response.sendRedirect(request.getContextPath() + "/public/login.jsp");
+            return;
+        }
+
+        // Obtener el rol del usuario desde la sesión
+        String rol = (String) session.getAttribute("rol");
+
         String action = request.getParameter("action");
         String clienteIdParam = request.getParameter("clienteId");
 
@@ -92,7 +119,13 @@ public class CRUDMascota extends HttpServlet {
                 System.out.println("Número de mascotas encontradas: " + mascotas.size()); // Depuración
 
                 request.setAttribute("mascotas", mascotas);
-                request.getRequestDispatcher("/admin/listadoMascotas.jsp").forward(request, response);
+
+                // Redirigir según el rol del usuario
+                if ("Cliente".equals(rol)) {
+                    request.getRequestDispatcher("/cliente/misMascotas.jsp").forward(request, response);
+                } else {
+                    request.getRequestDispatcher("/admin/listadoMascotas.jsp").forward(request, response);
+                }
             } catch (NumberFormatException e) {
                 System.out.println("Error al convertir clienteId a entero: " + e.getMessage()); // Depuración
                 e.printStackTrace();
@@ -105,7 +138,13 @@ public class CRUDMascota extends HttpServlet {
                 System.out.println("Eliminando mascota ID: " + id + " del cliente ID: " + clienteId); // Depuración
 
                 dataMascota.remove(id);
-                response.sendRedirect(request.getContextPath() + "/crudmascota?action=list&clienteId=" + clienteId);
+
+                // Redirigir según el rol del usuario
+                if ("Cliente".equals(rol)) {
+                    response.sendRedirect(request.getContextPath() + "/listarMascotas");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/crudmascota?action=list&clienteId=" + clienteId);
+                }
             } catch (NumberFormatException e) {
                 System.out.println("Error al convertir ID a entero: " + e.getMessage()); // Depuración
                 e.printStackTrace();
@@ -125,7 +164,13 @@ public class CRUDMascota extends HttpServlet {
 
                 request.setAttribute("mascota", mascota);
                 request.setAttribute("clientes", dataCliente.getAll());
-                request.getRequestDispatcher("/admin/formEditMascota.jsp").forward(request, response);
+
+                // Redirigir según el rol del usuario
+                if ("Cliente".equals(rol)) {
+                    request.getRequestDispatcher("/cliente/formEditMiMascota.jsp").forward(request, response);
+                } else {
+                    request.getRequestDispatcher("/admin/formEditMascota.jsp").forward(request, response);
+                }
             } catch (NumberFormatException e) {
                 System.out.println("Error al convertir ID a entero: " + e.getMessage()); // Depuración
                 e.printStackTrace();

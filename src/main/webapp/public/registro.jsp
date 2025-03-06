@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Registro</title>
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
     <style>
         body {
@@ -66,20 +66,6 @@
             color: red;
             margin-top: 1rem;
         }
-
-        p.registro {
-            margin-top: 1rem;
-        }
-
-        a.registro-link {
-            color: #6a1b9a;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a.registro-link:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -87,22 +73,36 @@
         <h1>Veterinaria</h1>
     </header>
     <main class="container">
-        <h2>Login</h2>
-        <form action="${pageContext.request.contextPath}/login" method="POST">
+        <h2>Registro</h2>
+        <form action="${pageContext.request.contextPath}/registro" method="POST">
+            <!-- Datos del Cliente -->
+            <label for="dni">DNI:</label>
+            <input type="text" id="dni" name="dni" placeholder="Ingrese su DNI" required>
+
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
+
+            <label for="direccion">Dirección:</label>
+            <input type="text" id="direccion" name="direccion" placeholder="Ingrese su dirección" required>
+
+            <label for="telefono">Teléfono:</label>
+            <input type="text" id="telefono" name="telefono" placeholder="Ingrese su teléfono" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Ingrese su email" required>
+
+            <!-- Datos del Usuario -->
             <label for="nombreUsuario">Nombre de Usuario:</label>
             <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Ingrese su nombre de usuario" required>
-            
+
             <label for="contraseña">Contraseña:</label>
             <input type="password" id="contraseña" name="contraseña" placeholder="Ingrese su contraseña" required>
-            
-            <button type="submit" class="contrast">Iniciar Sesión</button>
+
+            <button type="submit">Registrarse</button>
         </form>
         <% if (request.getAttribute("error") != null) { %>
             <p class="error"><%= request.getAttribute("error") %></p>
         <% } %>
-        <p class="registro">
-            ¿No tienes una cuenta? <a href="${pageContext.request.contextPath}/public/registro.jsp" class="registro-link">Regístrate aquí</a>.
-        </p>
     </main>
     <footer>
         <p>Veterinaria XYZ - Todos los derechos reservados</p>

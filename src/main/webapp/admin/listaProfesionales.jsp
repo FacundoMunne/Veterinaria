@@ -44,7 +44,7 @@
                     <td>
                         <a href="${pageContext.request.contextPath}/crudprofesional?action=edit&id=<%= profesional.getIdProfesional() %>" class="secondary">Editar</a>
                         <a href="${pageContext.request.contextPath}/crudprofesional?action=delete&id=<%= profesional.getIdProfesional() %>" class="contrast">Eliminar</a>
-                        <a href="${pageContext.request.contextPath}/listaTurnosProfServlet?idProfesional=<%= profesional.getIdProfesional() %>" class="primary">Ver Turnos</a>
+                        <a href="${pageContext.request.contextPath}/listaTurnosxProf?idProfesional=<%= profesional.getIdProfesional() %>" class="primary">Ver Turnos</a>
                     </td>
                 </tr>
                 <% 
