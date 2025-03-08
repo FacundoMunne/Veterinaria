@@ -11,6 +11,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista Turnos</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@latest/css/pico.min.css">
+    <style >.button.disabled {
+    background-color: #cccccc; /* Color de fondo gris */
+    cursor: not-allowed; /* Cursor de "no permitido" */
+    pointer-events: none; /* Evitar clics */
+    opacity: 0.6; /* Reducir opacidad */
+}</style>
+    
 </head>
 <main class="container">
     <h1>Turnos del Profesional</h1>
@@ -61,14 +68,20 @@
                            <td><%= turno.getMascota().getNombre() %></td>
                            <td><%= turno.getEstado() %></td>
                            <td>
-                               <form method="post" action="${pageContext.request.contextPath}/cambiarEstadoTurnoServlet" style="display: inline;">
-                                   <input type="hidden" name="idMascota" value="<%= turno.getMascota().getIdMascota() %>">
-                                   <input type="hidden" name="idProfesional" value="<%= turno.getProfesional().getIdProfesional() %>">
-                                   <input type="hidden" name="fechaHora" value="<%= turno.getFechaHora() %>">
-                                   <button type="submit" name="accion" value="Recepcionado" <%= !"Programado".equals(turno.getEstado()) ? "disabled" : "" %>>Recepcionar</button>
-                                   <button type="submit" name="accion" value="Cancelado" <%= !"Programado".equals(turno.getEstado()) ? "disabled" : "" %>>Cancelar</button>
-                               </form>
-                           </td>
+    <form method="post" action="${pageContext.request.contextPath}/cambiarEstadoTurnoServlet" style="display: inline;">
+    <input type="hidden" name="idMascota" value="<%= turno.getMascota().getIdMascota() %>">
+    <input type="hidden" name="idProfesional" value="<%= turno.getProfesional().getIdProfesional() %>">
+    <input type="hidden" name="fechaHora" value="<%= turno.getFechaHora() %>">
+    
+    <!-- Botón Recepcionar (enlace con estilo de botón) -->
+    <a href="${pageContext.request.contextPath}/profesional/formObservacion.jsp?idMascota=<%= turno.getMascota().getIdMascota() %>&idProfesional=<%= turno.getProfesional().getIdProfesional() %>&fechaHora=<%= turno.getFechaHora() %>"
+       class="button <%= !"Programado".equals(turno.getEstado()) ? "disabled" : "" %>"
+       <%= !"Programado".equals(turno.getEstado()) ? "onclick=\"return false;\"" : "" %>>Recepcionar</a>
+    
+    <!-- Botón Cancelar -->
+    <button type="submit" name="accion" value="Cancelado" class="button" <%= !"Programado".equals(turno.getEstado()) ? "disabled" : "" %>>Cancelar</button>
+</form>
+</td>
                        </tr>
            <%
                    }

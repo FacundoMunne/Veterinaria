@@ -36,6 +36,10 @@
                                 <a href="${pageContext.request.contextPath}/historialTurnosMascotaServlet?idMascota=${mascota.idMascota}" class="button">
                                     Ver Historial
                                 </a>
+                                
+                                <a href="${pageContext.request.contextPath}/verObservacionesMascotaServlet?idMascota=${mascota.idMascota}" class="button secondary">
+                                    Ver Observaciones
+                                </a>
                             </td>
                         </tr>
                     </c:forEach>
