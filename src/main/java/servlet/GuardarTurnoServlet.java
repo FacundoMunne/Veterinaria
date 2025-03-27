@@ -39,6 +39,7 @@ public class GuardarTurnoServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         String redirectUrl = request.getContextPath() + "/listarMascotas";
         
+        int idMascota = 0;  // Declarar idMascota fuera del try, para que sea accesible en los catch
         try {
             // 1. Validar sesión
             if (session == null || session.getAttribute("usuario") == null) {
@@ -47,7 +48,7 @@ public class GuardarTurnoServlet extends HttpServlet {
             }
 
             // 2. Validar y parsear parámetros
-            int idMascota = Integer.parseInt(request.getParameter("idMascota"));
+            idMascota = Integer.parseInt(request.getParameter("idMascota"));
             int idProfesional = Integer.parseInt(request.getParameter("idProfesional"));
             LocalDateTime fechaHora = LocalDateTime.parse(
                 request.getParameter("fechaHora"),
@@ -89,7 +90,7 @@ public class GuardarTurnoServlet extends HttpServlet {
             // Redirigir a error.jsp con detalles del error
             request.setAttribute("errorType", "ID inválido");
             request.setAttribute("errorMessage", "Los IDs deben ser números válidos");
-            request.setAttribute("errorRedirect", request.getContextPath() + "/cliente/seleccionarTurno.jsp");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/sacarTurno?idMascota=" + idMascota);
             request.setAttribute("errorButtonText", "Volver");
             request.setAttribute("errorDebug", e.getMessage());
             request.getRequestDispatcher("/public/error.jsp").forward(request, response);
@@ -97,7 +98,7 @@ public class GuardarTurnoServlet extends HttpServlet {
         } catch (DateTimeParseException e) {
             request.setAttribute("errorType", "Fecha inválida");
             request.setAttribute("errorMessage", "Formato de fecha/hora inválido (use: yyyy-MM-ddTHH:mm)");
-            request.setAttribute("errorRedirect", request.getContextPath() + "/cliente/seleccionarTurno.jsp");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/sacarTurno?idMascota=" + idMascota);
             request.setAttribute("errorButtonText", "Volver");
             request.setAttribute("errorDebug", e.getMessage());
             request.getRequestDispatcher("/public/error.jsp").forward(request, response);
@@ -105,7 +106,7 @@ public class GuardarTurnoServlet extends HttpServlet {
         } catch (IllegalArgumentException e) {
             request.setAttribute("errorType", "Entrada inválida");
             request.setAttribute("errorMessage", e.getMessage());
-            request.setAttribute("errorRedirect", request.getContextPath() + "/cliente/seleccionarTurno.jsp");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/sacarTurno?idMascota=" + idMascota);
             request.setAttribute("errorButtonText", "Volver");
             request.setAttribute("errorDebug", e.getMessage());
             request.getRequestDispatcher("/public/error.jsp").forward(request, response);
@@ -113,7 +114,7 @@ public class GuardarTurnoServlet extends HttpServlet {
         } catch (IllegalStateException e) {
             request.setAttribute("errorType", "Disponibilidad del profesional");
             request.setAttribute("errorMessage", e.getMessage());
-            request.setAttribute("errorRedirect", request.getContextPath() + "/cliente/seleccionarTurno.jsp");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/sacarTurno?idMascota=" + idMascota);
             request.setAttribute("errorButtonText", "Volver");
             request.setAttribute("errorDebug", e.getMessage());
             request.getRequestDispatcher("/public/error.jsp").forward(request, response);
@@ -121,13 +122,15 @@ public class GuardarTurnoServlet extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("errorType", "Error general");
             request.setAttribute("errorMessage", "Error al agendar el turno");
-            request.setAttribute("errorRedirect", request.getContextPath() + "/cliente/seleccionarTurno.jsp");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/sacarTurno?idMascota=" + idMascota);
             request.setAttribute("errorButtonText", "Volver");
             request.setAttribute("errorDebug", e.getMessage());
             request.getRequestDispatcher("/public/error.jsp").forward(request, response);
             return;
         }
-        
+
         response.sendRedirect(redirectUrl);
     }
+
+
 }
