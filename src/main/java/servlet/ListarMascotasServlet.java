@@ -14,29 +14,62 @@ import java.util.List;
 
 @WebServlet("/listarMascotas")
 public class ListarMascotasServlet extends HttpServlet {
-    private DataMascota dataMascota = new DataMascota();
+    private DataMascota dataMascota;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Obtener la sesión actual
-        HttpSession session = request.getSession(false);
+    public void init() throws ServletException {
+        dataMascota = new DataMascota();
+    }
 
-        // Verificar si el usuario está logueado y es un cliente
-        if (session == null || session.getAttribute("idCliente") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        String redirectUrl = request.getContextPath() + "/public/login.jsp";
+        
+        try {
+            // 1. Validar sesión y rol
+            if (session == null || session.getAttribute("idCliente") == null) {
+                request.getSession().setAttribute("errorMessage", "Debe iniciar sesión como cliente para acceder a esta función");
+                response.sendRedirect(redirectUrl);
+                return;
+            }
+
+            // 2. Obtener ID del cliente
+            int idCliente = (int) session.getAttribute("idCliente");
+
+            // 3. Obtener mascotas del cliente
+            List<Mascota> mascotas = dataMascota.getByClienteId(idCliente);
+            
+            // 4. Manejar caso sin mascotas
+            if (mascotas.isEmpty()) {
+                request.setAttribute("infoMessage", "No tiene mascotas registradas aún");
+            }
+
+            // 5. Pasar datos a la vista
+            request.setAttribute("mascotas", mascotas);
+            request.getRequestDispatcher("/cliente/misMascotas.jsp").forward(request, response);
+            return;
+            
+        } catch (ClassCastException e) {
+            // Redirigir a error.jsp con detalles del error
+            request.setAttribute("errorType", "Error de sesión");
+            request.setAttribute("errorMessage", "Error en los datos de sesión");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/public/login.jsp");
+            request.setAttribute("errorButtonText", "Iniciar sesión");
+            request.setAttribute("errorDebug", e.getMessage());
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
+            return;
+        } catch (Exception e) {
+            // Redirigir a error.jsp con detalles del error
+            request.setAttribute("errorType", "Error general");
+            request.setAttribute("errorMessage", "Error al obtener la lista de mascotas");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/cliente/misMascotas.jsp");
+            request.setAttribute("errorButtonText", "Volver");
+            request.setAttribute("errorDebug", e.getMessage());
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
             return;
         }
-
-        // Obtener la idCliente de la sesión
-        int idCliente = (int) session.getAttribute("idCliente");
-
-        // Obtener las mascotas del cliente
-        List<Mascota> mascotas = dataMascota.getByClienteId(idCliente);
-
-        // Guardar las mascotas en el alcance de la solicitud
-        request.setAttribute("mascotas", mascotas);
-
-        // Redirigir al JSP que muestra la lista de mascotas
-        request.getRequestDispatcher("/cliente/misMascotas.jsp").forward(request, response);
     }
 }

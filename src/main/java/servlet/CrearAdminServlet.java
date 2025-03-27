@@ -26,7 +26,7 @@ public class CrearAdminServlet extends HttpServlet {
         try {
             // Recibir datos del formulario JSP
             String nombreUsuario = request.getParameter("nombreUsuario");
-            String contraseñaPlana = request.getParameter("contraseña");
+            String contraseñaPlana = request.getParameter("password");
 
             // Crear un usuario administrador
             Usuario admin = new Usuario();

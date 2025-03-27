@@ -2,7 +2,9 @@ package servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,63 +16,104 @@ import clases.Usuario;
 import clases.Observacion;
 import data.DataTurno;
 import data.DataObservacion;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @WebServlet("/cambiarEstadoTurnoServlet")
 public class CambiarEstadoTurnoServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Obtener la sesión actual
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         HttpSession session = request.getSession(false);
+
+        // 1. Validar sesión
         if (session == null || session.getAttribute("usuario") == null) {
-            // Si no hay sesión, redirigir al login
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            setErrorAndRedirect(session, response, "Acceso denegado", 
+                "Debe iniciar sesión para realizar esta acción", "#FF9800", "/");
             return;
         }
 
-        // Obtener el usuario de la sesión
         Usuario usuario = (Usuario) session.getAttribute("usuario");
 
-        // Obtener parámetros del formulario
-        int idMascota = Integer.parseInt(request.getParameter("idMascota"));
-        int idProfesional = Integer.parseInt(request.getParameter("idProfesional"));
-        String fechaHoraStr = request.getParameter("fechaHora");
-        String accion = request.getParameter("accion");
-        String observacion = request.getParameter("observacion"); // Nuevo parámetro
+        try {
+            // 2. Validar y obtener parámetros
+            int idMascota = parseInteger(request.getParameter("idMascota"), "ID de mascota inválido");
+            int idProfesional = parseInteger(request.getParameter("idProfesional"), "ID de profesional inválido");
+            String accion = validateAction(request.getParameter("accion"));
+            LocalDateTime fechaHora = parseDate(request.getParameter("fechaHora"));
 
-        // Convertir fechaHora a LocalDateTime
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        LocalDateTime fechaHora = LocalDateTime.parse(fechaHoraStr, formatter);
-
-        // Cambiar el estado del turno
-        DataTurno dataTurno = new DataTurno();
-        DataObservacion dataObs = new DataObservacion(); // Nueva instancia para manejar observaciones
-        Turno turno = dataTurno.buscarTurnoPorClaveCompuesta(idMascota, idProfesional, fechaHora);
-
-        if (turno != null && "Programado".equals(turno.getEstado())) {
-            // Solo actualizar si el estado actual es "Programado"
-            turno.setEstado(accion); // Actualizar el estado
-            dataTurno.actualizarTurno(turno); // Guardar cambios en la base de datos
-
-            // Si la acción es "Recepcionado", guardar la observación
-            if ("Recepcionado".equals(accion) && observacion != null && !observacion.isEmpty()) {
-                Observacion obs = new Observacion(idMascota, observacion);
-                try {
-					dataObs.add(obs);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
+            // 3. Buscar turno
+            DataTurno dataTurno = new DataTurno();
+            Turno turno = dataTurno.buscarTurnoPorClaveCompuesta(idMascota, idProfesional, fechaHora);
+            if (turno == null) {
+                throw new IllegalArgumentException("Turno no encontrado");
             }
-        }
 
-        // Redirigir según el rol del usuario
-        if (usuario.getRol().getIdRol() == 1) { // Administrador
-            response.sendRedirect(request.getContextPath() + "/listaTurnos");
-        } else if (usuario.getRol().getIdRol() == 2) { // Profesional
-            response.sendRedirect(request.getContextPath() + "/listaTurnosProfServlet?idProfesional=" + idProfesional);
-        } else { // Otros roles (por ejemplo, cliente)
-            response.sendRedirect(request.getContextPath() + "/error.jsp?mensaje=Acceso denegado");
+            if (!"Programado".equals(turno.getEstado())) {
+                throw new IllegalStateException("Solo se pueden modificar turnos en estado 'Programado'");
+            }
+
+            // 4. Actualizar estado del turno
+            turno.setEstado(accion);
+            dataTurno.actualizarTurno(turno);
+
+            // 5. Registrar observación si es necesario
+            String observacion = request.getParameter("observacion");
+            if ("Recepcionado".equals(accion) && observacion != null && !observacion.trim().isEmpty()) {
+                DataObservacion dataObs = new DataObservacion();
+                Observacion obs = new Observacion(idMascota, observacion.trim());
+                dataObs.add(obs);
+            }
+
+            // 6. Redirigir según rol del usuario
+            String successUrl = (usuario.getRol().getIdRol() == 1)
+                    ? "/listaTurnos?success=Estado+actualizado+correctamente"
+                    : "/listaTurnosProfServlet?idProfesional=" + idProfesional + "&success=Estado+actualizado+correctamente";
+            response.sendRedirect(request.getContextPath() + successUrl);
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            setErrorAndRedirect(session, response, "Error de validación", e.getMessage(), "#FF9800", "/listaTurnos");
+        } catch (DateTimeParseException e) {
+            setErrorAndRedirect(session, response, "Error de fecha", "Formato de fecha/hora inválido (yyyy-MM-ddTHH:mm)", "#FF9800", "/listaTurnos");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            setErrorAndRedirect(session, response, "Error de base de datos", "No se pudo completar la operación", "#F44336", "/listaTurnos");
+        } catch (Exception e) {
+            e.printStackTrace();
+            setErrorAndRedirect(session, response, "Error inesperado", "Ocurrió un problema al procesar la solicitud", "#F44336", "/listaTurnos");
         }
+    }
+
+    private int parseInteger(String value, String errorMessage) throws IllegalArgumentException {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+    private LocalDateTime parseDate(String fechaHoraStr) throws DateTimeParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        return LocalDateTime.parse(fechaHoraStr, formatter);
+    }
+
+    private String validateAction(String accion) throws IllegalArgumentException {
+        if (!"Recepcionado".equals(accion) && !"Cancelado".equals(accion)) {
+            throw new IllegalArgumentException("Acción no permitida para el turno");
+        }
+        return accion;
+    }
+
+    private void setErrorAndRedirect(HttpSession session, HttpServletResponse response,
+                                     String errorType, String errorMessage, String errorColor, String redirectPath) 
+                                     throws IOException {
+        if (session != null) {
+            session.setAttribute("errorType", errorType);
+            session.setAttribute("errorMessage", errorMessage);
+            session.setAttribute("errorColor", errorColor);
+            session.setAttribute("errorRedirect", redirectPath);
+            session.setAttribute("errorButtonText", "Volver");
+        }
+        response.sendRedirect("/public/error.jsp");
     }
 }

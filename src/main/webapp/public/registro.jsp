@@ -96,7 +96,7 @@
             <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Ingrese su nombre de usuario" required>
 
             <label for="contraseña">Contraseña:</label>
-            <input type="password" id="contraseña" name="contraseña" placeholder="Ingrese su contraseña" required>
+            <input type="password" id="password" name="password" placeholder="Ingrese su contraseña" required>
 
             <button type="submit">Registrarse</button>
         </form>

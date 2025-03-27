@@ -31,7 +31,9 @@ public class listaTurnosProf extends HttpServlet {
             if (session == null || session.getAttribute("idProfesional") == null) {
                 System.out.println("❌ ERROR: No hay sesión o el idProfesional no está en la sesión.");
                 request.setAttribute("errorMessage", "Debes iniciar sesión para acceder a esta página.");
-                response.sendRedirect(request.getContextPath() + "/public/error.jsp");
+                request.setAttribute("errorRedirect", request.getContextPath() + "/public/login.jsp");
+                request.setAttribute("errorButtonText", "Volver al Login");
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
 
@@ -69,8 +71,13 @@ public class listaTurnosProf extends HttpServlet {
         } catch (Exception e) {
             System.out.println("❌ ERROR GENERAL:");
             e.printStackTrace();
-            request.setAttribute("errorMessage", e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
+            // Redirigir a error.jsp con detalles del error
+            request.setAttribute("errorType", "Error al obtener turnos");
+            request.setAttribute("errorMessage", "Ocurrió un error al intentar obtener los turnos del profesional.");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/profesional/listaTurnosProf.jsp");
+            request.setAttribute("errorButtonText", "Volver a la página de turnos");
+            request.setAttribute("errorDebug", e.getMessage());
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
         }
     }
 }

@@ -15,7 +15,7 @@
     </header>
     
     <main class="container">
-        <form action="crudprofesional" method="POST">
+        <form action="/Veterinaria/crudprofesional" method="POST">
             <% Profesional profesional = (Profesional) request.getAttribute("profesional"); %>
             <input type="hidden" name="idProfesional" value="<%= profesional != null ? profesional.getIdProfesional() : "" %>">
             
@@ -40,7 +40,7 @@
             <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Ingrese el nombre de usuario" required>
             
             <label for="contraseña">Contraseña:</label>
-            <input type="password" id="contraseña" name="contraseña" placeholder="Ingrese la contraseña" required>
+            <input type="password" id="password" name="password" placeholder="Ingrese la contraseña" required>
             
             <button type="submit" class="contrast">Guardar Profesional</button>
         </form>

@@ -12,7 +12,7 @@
         <input type="text" id="nombreUsuario" name="nombreUsuario" required><br><br>
 
         <label for="contraseña">Contraseña:</label>
-        <input type="password" id="contraseña" name="contraseña" required><br><br>
+        <input type="password" id="password" name="password" required><br><br>
 
         <input type="submit" value="Crear Administrador">
     </form>

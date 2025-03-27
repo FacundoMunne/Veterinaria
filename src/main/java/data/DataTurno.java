@@ -104,29 +104,61 @@ public class DataTurno {
 	 
 	    
 	 public void add(Turno turno) {
-		    String query = "INSERT INTO Turnos (fechaHora, idMascota, idProfesional, estado) VALUES (?, ?, ?, ?)";
+		    String checkQuery = "SELECT COUNT(*) FROM Turnos WHERE idProfesional = ? AND fechaHora = ? AND estado = 'ACTIVO'"; 
+		    String insertQuery = "INSERT INTO Turnos (fechaHora, idMascota, idProfesional, estado) VALUES (?, ?, ?, ?)";
 		    Connection conn = null;
 		    PreparedStatement stmt = null;
+		    ResultSet rs = null;
 
 		    try {
 		        conn = DbConnector.getInstancia().getConn();
-		        stmt = conn.prepareStatement(query);
+		        
+		        // Desactivar autocommit
+		        conn.setAutoCommit(false);
+
+		        // Verificar si ya existe un turno para el profesional en el mismo horario
+		        stmt = conn.prepareStatement(checkQuery);
+		        stmt.setInt(1, turno.getProfesional().getIdProfesional());
+		        stmt.setTimestamp(2, Timestamp.valueOf(turno.getFechaHora())); // Fecha y hora de inicio del turno
+		        rs = stmt.executeQuery();
+
+		        if (rs.next() && rs.getInt(1) > 0) {
+		            // Si ya existe un turno en esa fechaHora, lanzar excepción
+		            throw new SQLException("Ya existe un turno para este profesional en el horario especificado.");
+		        }
+
+		        // Si no existe un turno con la misma fechaHora, se inserta el nuevo turno
+		        stmt = conn.prepareStatement(insertQuery);
 		        stmt.setTimestamp(1, Timestamp.valueOf(turno.getFechaHora()));
 		        stmt.setInt(2, turno.getMascota().getIdMascota());
 		        stmt.setInt(3, turno.getProfesional().getIdProfesional());
-		        stmt.setString(4, turno.getEstado()); // Aquí se agrega el estado
+		        stmt.setString(4, turno.getEstado());
 
 		        int rowsInserted = stmt.executeUpdate();
 		        if (rowsInserted > 0) {
 		            System.out.println("El turno se guardó correctamente.");
 		        }
+
+		        // Hacer commit explícito de la transacción
 		        conn.commit();
 		    } catch (SQLException e) {
 		        e.printStackTrace();
+		        try {
+		            if (conn != null) {
+		                conn.rollback();  // Hacer rollback en caso de error
+		            }
+		        } catch (SQLException rollbackEx) {
+		            rollbackEx.printStackTrace();
+		        }
+		        throw new RuntimeException("Error al agregar el turno: " + e.getMessage()); // O lanzar una excepción personalizada
 		    } finally {
 		        try {
+		            if (rs != null) rs.close();
 		            if (stmt != null) stmt.close();
-		            if (conn != null) DbConnector.getInstancia().releaseConn();
+		            if (conn != null) {
+		                conn.setAutoCommit(true);  // Restablecer autocommit a true
+		                DbConnector.getInstancia().releaseConn();
+		            }
 		        } catch (SQLException e) {
 		            e.printStackTrace();
 		        }
@@ -134,33 +166,76 @@ public class DataTurno {
 		}
 
 
+
+
 	 public void edit(Turno turno) {
-		    String query = "UPDATE Turnos SET fechaHora = ?, idMascota = ?, idProfesional = ?, estado = ? WHERE fechaHora = ? AND idMascota = ? AND idProfesional = ?";
+		    // Primero, verificar si ya existe un turno con la misma fechaHora para el mismo profesional y mascota
+		    String checkQuery = "SELECT COUNT(*) FROM Turnos WHERE idProfesional = ? AND fechaHora = ? AND idMascota = ? AND estado = 'ACTIVO'";
+		    String updateQuery = "UPDATE Turnos SET fechaHora = ?, idMascota = ?, idProfesional = ?, estado = ? WHERE fechaHora = ? AND idMascota = ? AND idProfesional = ?";
 		    Connection conn = null;
 		    PreparedStatement stmt = null;
+		    ResultSet rs = null;
 
 		    try {
 		        conn = DbConnector.getInstancia().getConn();
-		        stmt = conn.prepareStatement(query);
+		        
+		        // Desactivar autocommit
+		        conn.setAutoCommit(false);
+
+		        // Verificar si ya existe un turno con la misma fechaHora y mismo profesional y mascota
+		        stmt = conn.prepareStatement(checkQuery);
+		        stmt.setInt(1, turno.getProfesional().getIdProfesional());
+		        stmt.setTimestamp(2, Timestamp.valueOf(turno.getFechaHora()));
+		        stmt.setInt(3, turno.getMascota().getIdMascota());
+		        rs = stmt.executeQuery();
+
+		        if (rs.next() && rs.getInt(1) > 0) {
+		            // Si ya existe un turno en esa fechaHora, lanzar excepción
+		            throw new SQLException("Ya existe un turno para este profesional y esta mascota en el horario especificado.");
+		        }
+
+		        // Si no existe un turno con la misma fechaHora, se procede a actualizar el turno
+		        stmt = conn.prepareStatement(updateQuery);
 		        stmt.setTimestamp(1, Timestamp.valueOf(turno.getFechaHora()));
 		        stmt.setInt(2, turno.getMascota().getIdMascota());
 		        stmt.setInt(3, turno.getProfesional().getIdProfesional());
 		        stmt.setString(4, turno.getEstado()); // Aquí se agrega el estado
-		        stmt.setTimestamp(5, Timestamp.valueOf(turno.getFechaHora()));
+		        stmt.setTimestamp(5, Timestamp.valueOf(turno.getFechaHora())); // Fecha y hora del turno anterior
 		        stmt.setInt(6, turno.getMascota().getIdMascota());
 		        stmt.setInt(7, turno.getProfesional().getIdProfesional());
-		        stmt.executeUpdate();
+
+		        int rowsUpdated = stmt.executeUpdate();
+		        if (rowsUpdated > 0) {
+		            System.out.println("El turno se actualizó correctamente.");
+		        }
+
+		        // Hacer commit explícito de la transacción
+		        conn.commit();
 		    } catch (SQLException e) {
 		        e.printStackTrace();
+		        try {
+		            if (conn != null) {
+		                conn.rollback();  // Hacer rollback en caso de error
+		            }
+		        } catch (SQLException rollbackEx) {
+		            rollbackEx.printStackTrace();
+		        }
+		        throw new RuntimeException("Error al editar el turno: " + e.getMessage());
 		    } finally {
 		        try {
+		            if (rs != null) rs.close();
 		            if (stmt != null) stmt.close();
-		            if (conn != null) DbConnector.getInstancia().releaseConn();
+		            if (conn != null) {
+		                conn.setAutoCommit(true);  // Restablecer autocommit a true
+		                DbConnector.getInstancia().releaseConn();
+		            }
 		        } catch (SQLException e) {
 		            e.printStackTrace();
 		        }
 		    }
 		}
+
+
 
 
 
@@ -490,4 +565,6 @@ public class DataTurno {
 
 		    return turnos;
 		}
+	 
+	 
 }

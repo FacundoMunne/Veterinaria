@@ -1,17 +1,15 @@
 package servlet;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import javax.servlet.http.HttpSession;
 import clases.*;
 import data.*;
 
@@ -30,47 +28,88 @@ public class crearTurno extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        String redirectUrl;
+        
         try {
-            // Obtener los parámetros del formulario
+            // 1. Validar sesión y permisos
+            if (session == null || session.getAttribute("usuario") == null) {
+                throw new SecurityException("Debe iniciar sesión para realizar esta acción");
+            }
+            
+            Usuario usuario = (Usuario) session.getAttribute("usuario");
+            if (usuario.getRol() == null || usuario.getRol().getIdRol() != 1) {
+                throw new SecurityException("No tiene permisos para crear turnos");
+            }
+
+            // 2. Validar y parsear parámetros
             int idMascota = Integer.parseInt(request.getParameter("idMascota"));
             int idProfesional = Integer.parseInt(request.getParameter("idProfesional"));
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-            LocalDateTime fechaHora = LocalDateTime.parse(request.getParameter("fechaHora"), formatter);
+            LocalDateTime fechaHora = LocalDateTime.parse(
+                request.getParameter("fechaHora"), 
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+            );
 
-            // Buscar la Mascota y el Profesional
+            // Validar fecha no pasada
+            if (fechaHora.isBefore(LocalDateTime.now())) {
+                throw new IllegalArgumentException("No se pueden crear turnos en fechas pasadas");
+            }
+
+            // 3. Obtener mascota y profesional
             Mascota mascota = dataMascota.getById(idMascota);
             Profesional profesional = dataProfesional.getById(idProfesional);
 
-            // Verificar que no sean nulos
             if (mascota == null || profesional == null) {
-                request.setAttribute("errorMessage", "No se pudo encontrar la mascota o el profesional.");
-                request.getRequestDispatcher("/public/error.jsp").forward(request, response);
-                return;
+                throw new IllegalArgumentException("Mascota o profesional no encontrados");
             }
 
-            // Verificar disponibilidad del profesional en la fecha y hora
-            boolean disponible = dataTurno.isProfesionalAvailable(idProfesional, fechaHora);
-            if (!disponible) {
-                request.setAttribute("errorMessage", "El profesional no está disponible en la fecha y hora seleccionadas.");
-                request.getRequestDispatcher("/public/error.jsp").forward(request, response);
-                return;
+            // 4. Verificar disponibilidad
+            if (!dataTurno.isProfesionalAvailable(idProfesional, fechaHora)) {
+                throw new IllegalStateException("El profesional no está disponible en ese horario");
             }
 
-            // Crear el turno
-            String estado = "Programado";
-            Turno turno = new Turno(mascota, profesional, fechaHora, estado);
-
-            // Guardar el turno en la base de datos
+            // 5. Crear y guardar turno
+            Turno turno = new Turno();
+            turno.setMascota(mascota);
+            turno.setProfesional(profesional);
+            turno.setFechaHora(fechaHora);
+            turno.setEstado("Programado");
+            
+            // Este es el único método que podría lanzar SQLException
             dataTurno.add(turno);
 
-            // Redirigir a la página de confirmación
-            response.sendRedirect("/admin/turnosConfirmados.jsp");
-
-        } catch (NumberFormatException | DateTimeParseException e) {
+            // 6. Redirección exitosa
+            redirectUrl = request.getContextPath() + "/admin/turnosConfirmados.jsp?success=Turno+creado+exitosamente";
+            
+        } catch (SecurityException e) {
+            redirectUrl = handleError(request, "Acceso denegado", e.getMessage());
+        } catch (NumberFormatException e) {
+            redirectUrl = handleError(request, "Error de formato", "Los IDs deben ser números válidos");
+        } catch (DateTimeParseException e) {
+            redirectUrl = handleError(request, "Error de fecha", "Formato de fecha/hora inválido (use: yyyy-MM-ddTHH:mm)");
+        } catch (IllegalArgumentException e) {
+            redirectUrl = handleError(request, "Datos inválidos", e.getMessage());
+        } catch (IllegalStateException e) {
+            redirectUrl = handleError(request, "No disponible", e.getMessage());
+        } catch (Exception e) {
+            // Este bloque capturará cualquier otra excepción, incluyendo SQLException si dataTurno.add() la lanza
+            redirectUrl = handleError(request, "Error inesperado", "Ocurrió un problema al crear el turno");
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Datos inválidos. Por favor, verifica los valores ingresados.");
-            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
         }
+        
+        response.sendRedirect(redirectUrl);
+    }
+
+    private String handleError(HttpServletRequest request, String errorType, String errorMessage) {
+        // Se establecen los atributos de error en la sesión para mostrar en error.jsp
+        HttpSession session = request.getSession();
+        session.setAttribute("errorType", errorType);
+        session.setAttribute("errorMessage", errorMessage);
+        
+        // Redirigir a la página de error
+        return request.getContextPath() + "/public/error.jsp";
     }
 }

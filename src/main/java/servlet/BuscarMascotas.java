@@ -1,8 +1,9 @@
 package servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -13,31 +14,70 @@ import data.*;
 
 @WebServlet("/buscarMascotas")
 public class BuscarMascotas extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String dni = request.getParameter("dni");
-        System.out.println("DNI recibido: " + dni);
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        try {
+            // 1. Validar parámetro DNI
+            String dni = validateDni(request.getParameter("dni"));
 
-        // Obtener cliente y mascotas 
-        DataCliente dataCliente = new DataCliente();
-        Cliente cliente = dataCliente.getByDni(dni);
+            // 2. Buscar cliente
+            DataCliente dataCliente = new DataCliente();
+            Cliente cliente = dataCliente.getByDni(dni);
+            if (cliente == null) {
+                throw new IllegalArgumentException("No existe un cliente con DNI: " + dni);
+            }
 
-        if (cliente != null) {
+            // 3. Obtener datos relacionados
             DataMascota dataMascota = new DataMascota();
             DataProfesional dataProfesional = new DataProfesional();
+
             List<Mascota> mascotas = dataMascota.getByClienteId(cliente.getIdCliente());
             List<Profesional> profesionales = dataProfesional.getAll();
-            
 
+            // 4. Validar si el cliente tiene mascotas registradas
+            if (mascotas == null || mascotas.isEmpty()) {
+                throw new IllegalArgumentException("El cliente no tiene mascotas registradas");
+            }
+
+            // 5. Enviar datos a la vista
             request.setAttribute("cliente", cliente);
             request.setAttribute("mascotas", mascotas);
             request.setAttribute("profesionales", profesionales);
-            
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/seleccionarTurno.jsp");
-            dispatcher.forward(request, response);
-        } else {
-            request.setAttribute("error", "Cliente no encontrado");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/public/error.jsp");
-            dispatcher.forward(request, response);
+            request.getRequestDispatcher("/admin/seleccionarTurno.jsp").forward(request, response);
+
+        } catch (IllegalArgumentException e) {
+            setErrorAttributes(request, "Error de Validación", e.getMessage(), "#FF9800", e);
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            setErrorAttributes(request, "Error del Sistema", "Ocurrió un error al buscar las mascotas", "#F44336", e);
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
+        }
+    }
+
+    private String validateDni(String dni) throws IllegalArgumentException {
+        if (dni == null || dni.trim().isEmpty()) {
+            throw new IllegalArgumentException("El DNI es requerido");
+        }
+        if (!dni.matches("\\d{8}")) {
+            throw new IllegalArgumentException("DNI debe contener 8 dígitos numéricos");
+        }
+        return dni.trim();
+    }
+
+    private void setErrorAttributes(HttpServletRequest request, String type, 
+                                    String message, String color, Exception e) {
+        request.setAttribute("errorType", type);
+        request.setAttribute("errorMessage", message);
+        request.setAttribute("errorColor", color);
+        request.setAttribute("errorRedirect", request.getContextPath() + "/admin/buscarCliente.jsp");
+        request.setAttribute("errorButtonText", "Volver a buscar");
+
+        if (e != null) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            request.setAttribute("errorDebug", sw.toString());
         }
     }
 }

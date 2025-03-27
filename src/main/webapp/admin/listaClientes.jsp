@@ -58,7 +58,7 @@
                 %>
             </tbody>
         </table>
-        <a href="formCliente.jsp" class="contrast">Agregar Nuevo Cliente</a>
+        <a href="${pageContext.request.contextPath}/admin/formCliente.jsp">Agregar Nuevo Cliente</a>
     </main>
     <%@ include file="../public/footer.jsp" %>
 </body>

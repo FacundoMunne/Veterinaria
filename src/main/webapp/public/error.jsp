@@ -1,26 +1,44 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error - Veterinaria</title>
-    <!-- Pico CSS -->
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <style>
+        .error-header {
+            background-color: ${errorColor};
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        pre {
+            white-space: pre-wrap;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-<%@ include file="header.jsp" %>
     <main class="container">
-        <header>
-            <h1 style="color: red;">Ocurrió un Error</h1>
-        </header>
-        <section>
-            <p><strong>Detalles del error:</strong></p>
-            <blockquote>
-                ${errorMessage}
-            </blockquote>
-            <a href="${pageContext.request.contextPath}/public/login.jsp" role="button" class="secondary">Volver al inicio</a>
-        </section>
+        <div class="error-header">
+            <h1>${errorType}</h1>
+        </div>
+        
+        <article>
+            <p>${errorMessage}</p>
+            
+            <!-- Solo mostrar detalles en desarrollo -->
+            <c:if test="${initParam.modoDesarrollo == 'true'}">
+                <details>
+                    <summary>Detalles tÃ©cnicos</summary>
+                    <pre><c:out value="${errorDebug}"/></pre>
+                </details>
+            </c:if>
+            
+            <a href="${errorRedirect}" class="button">${errorButtonText}</a>
+        </article>
     </main>
-    <%@ include file="footer.jsp" %>
 </body>
 </html>

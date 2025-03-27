@@ -24,52 +24,71 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String nombreUsuario = request.getParameter("nombreUsuario");
-        String contraseña = request.getParameter("contraseña");
+        String contraseña = request.getParameter("password");
 
         // Depuración: Verificar datos recibidos
         System.out.println("DEBUG: Intento de login - Usuario: " + nombreUsuario);
 
-        // Buscar el usuario en la base de datos
-        Usuario usuario = dataUsuario.getByNombreUsuario(nombreUsuario);
+        try {
+            // Buscar el usuario en la base de datos
+            Usuario usuario = dataUsuario.getByNombreUsuario(nombreUsuario);
+            
+            
+            System.out.println("Contraseña ingresada: " + contraseña);
+            System.out.println("Contraseña almacenada: " + usuario.getContraseña());
+            System.out.println("Comparación BCrypt: " + BCrypt.checkpw(contraseña, usuario.getContraseña()));
 
-        if (usuario != null && BCrypt.checkpw(contraseña, usuario.getContraseña())) {
-            // Autenticación exitosa
-            HttpSession session = request.getSession();
-            session.setAttribute("usuario", usuario); // Guardar el usuario en la sesión
-            session.setAttribute("rol", usuario.getRol().getNombre()); // Guardar el nombre del rol en la sesión
+            if (usuario != null && BCrypt.checkpw(contraseña, usuario.getContraseña())) {
+                // Autenticación exitosa
+                HttpSession session = request.getSession();
+                session.setAttribute("usuario", usuario); // Guardar el usuario en la sesión
+                session.setAttribute("rol", usuario.getRol().getNombre()); // Guardar el nombre del rol en la sesión
 
-            // Obtener y guardar la id correspondiente según el rol
-            if (usuario.getRol().getIdRol() == 3) { // Rol de cliente
-                int idCliente = dataUsuario.getIdCliente(usuario.getIdUsuario());
-                session.setAttribute("idCliente", idCliente);
-            } else if (usuario.getRol().getIdRol() == 2) { // Rol de profesional
-                int idProfesional = dataUsuario.getIdProfesional(usuario.getIdUsuario());
-                session.setAttribute("idProfesional", idProfesional);
-            }
+                // Obtener y guardar la id correspondiente según el rol
+                if (usuario.getRol().getIdRol() == 3) { // Rol de cliente
+                    int idCliente = dataUsuario.getIdCliente(usuario.getIdUsuario());
+                    session.setAttribute("idCliente", idCliente);
+                } else if (usuario.getRol().getIdRol() == 2) { // Rol de profesional
+                    int idProfesional = dataUsuario.getIdProfesional(usuario.getIdUsuario());
+                    session.setAttribute("idProfesional", idProfesional);
+                }
 
-            // Depuración: Verificar rol y redirección
-            System.out.println("DEBUG: Autenticación exitosa - Rol: " + usuario.getRol().getNombre());
+                // Depuración: Verificar rol y redirección
+                System.out.println("DEBUG: Autenticación exitosa - Rol: " + usuario.getRol().getNombre());
 
-            // Redirigir según el rol del usuario
-            if (usuario.getRol().getIdRol() == 3) { // Cliente
-                response.sendRedirect(request.getContextPath() + "/public/menu.jsp");
-            } else if (usuario.getRol().getIdRol() == 2) { // Profesional
-                response.sendRedirect(request.getContextPath() + "/public/menu.jsp");
-            } else { // Otros roles (por ejemplo, admin)
-                response.sendRedirect(request.getContextPath() + "/public/menu.jsp");
-            }
-        } else {
-            // Autenticación fallida
-            System.out.println("DEBUG: Autenticación fallida - Usuario o contraseña incorrectos");
-
-            if (usuario == null) {
-                request.setAttribute("error", "El usuario no existe.");
+                // Redirigir según el rol del usuario
+                if (usuario.getRol().getIdRol() == 3) { // Cliente
+                    response.sendRedirect(request.getContextPath() + "/public/menu.jsp");
+                } else if (usuario.getRol().getIdRol() == 2) { // Profesional
+                    response.sendRedirect(request.getContextPath() + "/public/menu.jsp");
+                } else { // Otros roles (por ejemplo, admin)
+                    response.sendRedirect(request.getContextPath() + "/public/menu.jsp");
+                }
             } else {
-                request.setAttribute("error", "Contraseña incorrecta.");
-            }
+                // Autenticación fallida
+                System.out.println("DEBUG: Autenticación fallida - Usuario o contraseña incorrectos");
 
-            // Redirigir de nuevo al formulario de login con un mensaje de error
-            request.getRequestDispatcher("/public/login.jsp").forward(request, response);
+                if (usuario == null) {
+                    // Usuario no existe
+                    request.setAttribute("error", "El usuario no existe.");
+                } else {
+                    // Contraseña incorrecta
+                    request.setAttribute("error", "Contraseña incorrecta.");
+                }
+
+                // Redirigir de nuevo al formulario de login con un mensaje de error
+                request.getRequestDispatcher("/public/login.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            System.out.println("❌ ERROR AL INICIAR SESIÓN:");
+            e.printStackTrace();
+            // Redirigir a error.jsp con detalles del error
+            request.setAttribute("errorType", "Error de autenticación");
+            request.setAttribute("errorMessage", "Ocurrió un error al intentar iniciar sesión.");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/public/login.jsp");
+            request.setAttribute("errorButtonText", "Volver al login");
+            request.setAttribute("errorDebug", e.getMessage());
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
         }
     }
 }

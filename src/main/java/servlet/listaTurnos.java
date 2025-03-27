@@ -23,28 +23,39 @@ public class listaTurnos extends HttpServlet {
         DataMascota dataMascota = new DataMascota();
         DataProfesional dataProfesional = new DataProfesional();
 
-        // Obtener la lista de turnos actuales
-        List<Turno> listaTurnos = dataTurno.getAll();
-        List<Cliente> listaClientes = new ArrayList<Cliente>();
+        try {
+            // Obtener la lista de turnos actuales
+            List<Turno> listaTurnos = dataTurno.getAll();
+            List<Cliente> listaClientes = new ArrayList<Cliente>();
 
-        // Para cada turnola mascota y el profesional relacionados
-        for (Turno turno : listaTurnos) {
-            Mascota mascota = dataMascota.getById(turno.getMascota().getIdMascota());
-            System.out.println(mascota);
-            Cliente cliente = dataCliente.getById(mascota.getCliente().getIdCliente()); 
-            Profesional profesional = dataProfesional.getById(turno.getProfesional().getIdProfesional());
-            LocalDateTime fecha = turno.getFechaHora();
+            // Para cada turno, la mascota y el profesional relacionados
+            for (Turno turno : listaTurnos) {
+                Mascota mascota = dataMascota.getById(turno.getMascota().getIdMascota());
+                Cliente cliente = dataCliente.getById(mascota.getCliente().getIdCliente()); 
+                Profesional profesional = dataProfesional.getById(turno.getProfesional().getIdProfesional());
+                LocalDateTime fecha = turno.getFechaHora();
 
-            // Añadir los objetos relacionados al turno 
-            turno.setMascota(mascota);
-            turno.setProfesional(profesional);
+                // Añadir los objetos relacionados al turno
+                turno.setMascota(mascota);
+                turno.setProfesional(profesional);
+            }
+
+            // Guardar la lista de turnos
+            request.setAttribute("listaTurnos", listaTurnos);
+            request.setAttribute("listaClientes", listaClientes);
+
+            // Redirigir para mostrar los turnos
+            request.getRequestDispatcher("/admin/listaTurnos.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            // Redirigir a error.jsp con detalles del error
+            request.setAttribute("errorType", "Error general");
+            request.setAttribute("errorMessage", "Error al obtener los turnos");
+            request.setAttribute("errorRedirect", request.getContextPath() + "/admin/listaTurnos.jsp");
+            request.setAttribute("errorButtonText", "Volver");
+            request.setAttribute("errorDebug", e.getMessage());
+            request.getRequestDispatcher("/public/error.jsp").forward(request, response);
         }
-
-        // Guardar la lista de turnos 
-        request.setAttribute("listaTurnos", listaTurnos);
-        request.setAttribute("listaClientes", listaClientes); 
-
-        // Redirigir para mostrar los turnos
-        request.getRequestDispatcher("/admin/listaTurnos.jsp").forward(request, response);
     }
 }
+

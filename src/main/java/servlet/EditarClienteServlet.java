@@ -17,58 +17,147 @@ public class EditarClienteServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        dataCliente = new DataCliente(); // Inicializar DataCliente
+        dataCliente = new DataCliente();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Obtener el idCliente de la sesión
+        
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("idCliente") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
+        String redirectUrl = request.getContextPath() + "/cliente/informacionPersonal.jsp";
+        
+        try {
+            // 1. Validar sesión
+            if (session == null || session.getAttribute("idCliente") == null) {
+                response.sendRedirect(request.getContextPath() + "/public/login.jsp");
+                return;
+            }
 
-        int idCliente = (int) session.getAttribute("idCliente");
+            // 2. Obtener ID del cliente
+            int idCliente = (int) session.getAttribute("idCliente");
 
-        // Obtener los datos del cliente
-        Cliente cliente = dataCliente.getById(idCliente);
+            // 3. Obtener datos del cliente
+            Cliente cliente = dataCliente.getById(idCliente);
+            if (cliente == null) {
+                throw new IllegalArgumentException("Cliente no encontrado");
+            }
 
-        if (cliente != null) {
-            // Guardar el cliente en el alcance de la solicitud
+            // 4. Pasar datos a la vista
             request.setAttribute("cliente", cliente);
-            // Redirigir al JSP de edición
             request.getRequestDispatcher("/cliente/editarCliente.jsp").forward(request, response);
-        } else {
-            response.sendRedirect(request.getContextPath() + "/cliente/informacionPersonal.jsp");
+            return;
+            
+        } catch (Exception e) {
+            request.getSession().setAttribute("errorType", "Error al cargar datos del cliente");
+            request.getSession().setAttribute("errorMessage", "No se pudo cargar la información del cliente.");
+            request.getSession().setAttribute("errorDebug", e.toString());
+            request.getSession().setAttribute("errorRedirect", request.getContextPath() + "/cliente/informacionPersonal.jsp");
+            request.getSession().setAttribute("errorButtonText", "Volver a la página de información");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Obtener los datos del formulario
-        int idCliente = Integer.parseInt(request.getParameter("idCliente"));
-        String dni = request.getParameter("dni");
-        String nombre = request.getParameter("nombre");
-        String direccion = request.getParameter("direccion");
-        String telefono = request.getParameter("telefono");
-        String email = request.getParameter("email");
+        
+        HttpSession session = request.getSession(false);
+        String redirectUrl = request.getContextPath() + "/cliente/informacionPersonal.jsp";
+        
+        try {
+            // 1. Validar sesión
+            if (session == null || session.getAttribute("idCliente") == null) {
+                response.sendRedirect(request.getContextPath() + "/public/login.jsp");
+                return;
+            }
 
-        // Crear un objeto Cliente con los datos actualizados
-        Cliente cliente = new Cliente();
-        cliente.setIdCliente(idCliente);
-        cliente.setDni(dni);
-        cliente.setNombre(nombre);
-        cliente.setDireccion(direccion);
-        cliente.setTelefono(telefono);
-        cliente.setEmail(email);
+            // 2. Validar y obtener parámetros
+            int idCliente = Integer.parseInt(request.getParameter("idCliente"));
+            String dni = validateDni(request.getParameter("dni"));
+            String nombre = validateParameter(request.getParameter("nombre"), "Nombre");
+            String direccion = request.getParameter("direccion");
+            String telefono = validatePhone(request.getParameter("telefono"));
+            String email = validateEmail(request.getParameter("email"));
 
-        // Actualizar los datos en la base de datos
-        dataCliente.editII(cliente);
+            // 3. Verificar coincidencia de ID de sesión con formulario
+            int sessionId = (int) session.getAttribute("idCliente");
+            if (idCliente != sessionId) {
+                throw new SecurityException("No puedes editar otros clientes");
+            }
+            // 4. Crear y actualizar cliente
+            Cliente cliente = new Cliente();
+            cliente.setIdCliente(idCliente);
+            cliente.setDni(dni);
+            cliente.setNombre(nombre);
+            cliente.setDireccion(direccion);
+            cliente.setTelefono(telefono);
+            cliente.setEmail(email);
 
-        // Redirigir de vuelta a la página de información personal
-        response.sendRedirect(request.getContextPath() + "/cliente/informacionPersonal.jsp");
+            dataCliente.editII(cliente);
+            
+            // 5. Mensaje de éxito
+            request.getSession().setAttribute("successMessage", "Datos actualizados correctamente");
+            response.sendRedirect(redirectUrl); // Redirige a la página de información personal
+            return;
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("errorType", "Error en los datos ingresados");
+            request.getSession().setAttribute("errorMessage", "El ID de cliente no es válido.");
+            request.getSession().setAttribute("errorDebug", e.toString());
+            request.getSession().setAttribute("errorRedirect", request.getContextPath() + "/cliente/editarCliente.jsp");
+            request.getSession().setAttribute("errorButtonText", "Volver a editar cliente");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
+        } catch (IllegalArgumentException e) {
+            request.getSession().setAttribute("errorType", "Error de validación");
+            request.getSession().setAttribute("errorMessage", e.getMessage());
+            request.getSession().setAttribute("errorDebug", e.toString());
+            request.getSession().setAttribute("errorRedirect", request.getContextPath() + "/cliente/editarCliente.jsp");
+            request.getSession().setAttribute("errorButtonText", "Volver a editar cliente");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
+        } catch (SecurityException e) {
+            request.getSession().setAttribute("errorType", "Error de seguridad");
+            request.getSession().setAttribute("errorMessage", e.getMessage());
+            request.getSession().setAttribute("errorDebug", e.toString());
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
+        } catch (Exception e) {
+            request.getSession().setAttribute("errorType", "Error al actualizar cliente");
+            request.getSession().setAttribute("errorMessage", "Ocurrió un problema al actualizar los datos del cliente.");
+            request.getSession().setAttribute("errorDebug", e.toString());
+            request.getSession().setAttribute("errorRedirect", request.getContextPath() + "/cliente/informacionPersonal.jsp");
+            request.getSession().setAttribute("errorButtonText", "Volver a la página de información");
+            response.sendRedirect(request.getContextPath() + "/public/error.jsp");
+        }
+    }
+
+    // Métodos auxiliares de validación
+    private String validateParameter(String value, String fieldName) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " es requerido");
+        }
+        return value.trim();
+    }
+
+    private String validateDni(String dni) {
+        dni = validateParameter(dni, "DNI");
+        if (!dni.matches("\\d{8}")) {
+            throw new IllegalArgumentException("DNI debe tener 8 dígitos numéricos");
+        }
+        return dni;
+    }
+
+    private String validatePhone(String phone) {
+        phone = validateParameter(phone, "Teléfono");
+        if (!phone.matches("[0-9]{9,15}")) {
+            throw new IllegalArgumentException("Teléfono debe contener entre 9 y 15 dígitos");
+        }
+        return phone;
+    }
+
+    private String validateEmail(String email) {
+        email = validateParameter(email, "Email");
+        if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Formato de email inválido");
+        }
+        return email;
     }
 }

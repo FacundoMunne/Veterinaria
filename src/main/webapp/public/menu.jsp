@@ -77,7 +77,7 @@
                     <c:if test="${sessionScope.rol eq 'Cliente'}">
                         <li><a href="${pageContext.request.contextPath}/cliente/informacionPersonal.jsp">Información Personal</a></li>
 <li><a href="${pageContext.request.contextPath}/listarMascotas" class="button">Mis Mascotas</a></li>                        
-<li><a href="${pageContext.request.contextPath}/listarTurnos">Mis Turnos</a></li>
+<li><a href="${pageContext.request.contextPath}/listaTurnosClien">Mis Turnos</a></li>
                         <li><a href="${pageContext.request.contextPath}/cliente/ajustesCliente.jsp">Ajustes</a></li>
                     </c:if>
 
@@ -94,7 +94,6 @@
                         <li><a href="${pageContext.request.contextPath}/crudcliente">Gestión de Clientes</a></li>
                         <li><a href="${pageContext.request.contextPath}/crudprofesional">Gestión de Profesionales</a></li>
                         <li><a href="${pageContext.request.contextPath}/listaTurnos">Gestión de Turnos</a></li>
-                        <li><a href="${pageContext.request.contextPath}/admin/ajustes.jsp">Ajustes</a></li>
                     </c:if>
 
                     <%-- Cerrar sesión --%>

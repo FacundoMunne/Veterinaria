@@ -70,7 +70,7 @@ public class CRUDCliente extends HttpServlet {
 
         // Datos del Usuario
         String nombreUsuario = request.getParameter("nombreUsuario");
-        String contraseña = request.getParameter("contraseña");
+        String contraseña = request.getParameter("password");
 
         // Depuración: Imprimir datos recibidos
         System.out.println("DNI: " + dni);

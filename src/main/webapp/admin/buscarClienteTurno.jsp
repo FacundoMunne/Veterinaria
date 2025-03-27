@@ -12,7 +12,7 @@
 		<h1>Turnos</h1>    
 	</header>
  	<main>
-    <form action="buscarMascotas" method="post">
+    <form action="/Veterinaria/buscarMascotas" method="post">
         <label for="dni">DNI del Cliente:</label>
         <input type="text" id="dni" name="dni" required>
         <input type="submit" value="Buscar">

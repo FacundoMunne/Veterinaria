@@ -56,7 +56,7 @@
             </tbody>
         </table>
     </main>
-    <a href="buscarClienteTurno.jsp">Agregar nuevo Turno</a>
+    <a href="${pageContext.request.contextPath}/admin/buscarClienteTurno.jsp">Agregar nuevo Turno</a>
     <%@ include file="../public/footer.jsp" %>
 </body>
 </html>

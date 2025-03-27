@@ -14,7 +14,7 @@
     </header>
     
     <main class="container">
-        <form action="crudcliente" method="POST">
+        <form action="/Veterinaria/crudcliente" method="POST">
             <% Cliente cliente = (Cliente) request.getAttribute("cliente"); %>
             <input type="hidden" name="idCliente" value="<%= cliente != null ? cliente.getIdCliente() : "" %>">
             
@@ -39,7 +39,7 @@
             <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Ingrese el nombre de usuario" required>
             
             <label for="contraseña">Contraseña:</label>
-            <input type="password" id="contraseña" name="contraseña" placeholder="Ingrese la contraseña" required>
+            <input type="password" id="password" name="password" placeholder="Ingrese la contraseña" required>
             
             <button type="submit" class="contrast">Guardar Cliente</button>
         </form>

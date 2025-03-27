@@ -33,7 +33,7 @@
                 action = "update";
             }
         %>
-        <form action="crudmascota" method="post">
+        <form action="/Veterinaria/crudmascota" method="post">
             <input type="hidden" name="action" value="<%= action %>" />
             <input type="hidden" name="id" value="<%= mascota != null ? mascota.getIdMascota() : "" %>" />
             <input type="hidden" name="clienteId" value="<%= clienteId %>" />

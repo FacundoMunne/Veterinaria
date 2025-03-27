@@ -31,21 +31,19 @@ public class RegistroServlet extends HttpServlet {
             String telefono = request.getParameter("telefono");
             String email = request.getParameter("email");
             String nombreUsuario = request.getParameter("nombreUsuario");
-            String contraseña = request.getParameter("contraseña");
-
-            // Validar que todos los campos estén presentes
-            if (dni == null || nombre == null || direccion == null || telefono == null || email == null || nombreUsuario == null || contraseña == null) {
-                throw new IllegalArgumentException("Todos los campos son obligatorios.");
-            }
-
+            String contraseña = request.getParameter("password");
+            System.out.println(contraseña);
             // Hashear la contraseña
             String contraseñaHasheada = BCrypt.hashpw(contraseña, BCrypt.gensalt());
+
+            // Depuración: Mostrar la contraseña hasheada en consola
+            System.out.println("DEBUG: Contraseña hasheada: " + contraseñaHasheada);
 
             // Crear el objeto Usuario
             Usuario usuario = new Usuario();
             usuario.setNombreUsuario(nombreUsuario);
             usuario.setContraseña(contraseñaHasheada);
-            usuario.setRol(new Rol(3, "Cliente")); // Rol Cliente (idRol = 3)
+            usuario.setRol(new Rol(3, "Cliente")); 
 
             // Crear el objeto Cliente
             Cliente cliente = new Cliente();
@@ -62,13 +60,15 @@ public class RegistroServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/public/registroExitoso.jsp");
 
         } catch (IllegalArgumentException e) {
-            // Capturar errores de validación de campos
+            // Capturar errores de validación de campos y mostrar en error.jsp
+            System.out.println("ERROR: " + e.getMessage());  // Depuración: Mostrar mensaje de error en consola
             request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/public/error.jsp").forward(request, response);
 
         } catch (Exception e) {
-            // Capturar cualquier otra excepción
-            e.printStackTrace();
+            // Capturar cualquier otra excepción y redirigir a error.jsp
+            System.out.println("ERROR INESPERADO: " + e.getMessage());  // Depuración: Mostrar error en consola
+            e.printStackTrace();  // Imprimir el stack trace para detalles del error
             request.setAttribute("error", "Ocurrió un error inesperado. Intente nuevamente.");
             request.getRequestDispatcher("/public/error.jsp").forward(request, response);
         }

@@ -55,7 +55,7 @@
                 %>
             </tbody>
         </table>
-        <a href="formMascota.jsp?clienteId=<%= request.getParameter("clienteId") %>" class="contrast">Agregar Nueva Mascota</a>
+        <a href="${pageContext.request.contextPath}/admin/formMascota.jsp?clienteId=<%= request.getParameter("clienteId") %>" class="contrast">Agregar Nueva Mascota</a>
     </main>
     <%@ include file="../public/footer.jsp" %>
 </body>

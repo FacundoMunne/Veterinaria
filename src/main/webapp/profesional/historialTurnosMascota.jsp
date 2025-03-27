@@ -36,6 +36,8 @@
         <c:if test="${empty turnos}">
             <p>No hay turnos registrados para esta mascota.</p>
         </c:if>
+                <a href="${pageContext.request.contextPath}/listaMascotasProfServlet" class="button">Volver</a>
+        
     </main>
     <%@ include file="../public/footer.jsp" %>
 </body>
