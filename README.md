@@ -43,4 +43,12 @@ El sistema propuesto busca **modernizar y optimizar la gestión** de una clínic
 - **Paciente (Dueño de Mascota)** 🐾
 - **Profesional (Veterinario)** 🩺
 
+## 🔑 Datos de Acceso
+
+| Rol          | Usuario  | Contraseña  |
+|-------------|---------|------------|
+| Cliente     | FaqM5   | 1234       |
+| Profesional | jcaballo | 1234       |
+| Administrador | admin  | admin123   |
+
 
