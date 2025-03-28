@@ -16,8 +16,7 @@ El sistema propuesto busca **modernizar y optimizar la gestión** de una clínic
 
 ---
 ## 📌 Modelo de Dominio
-*(Aquí puedes insertar una imagen del modelo de dominio generado en draw.io u otro software.)*
-
+![Modelo de Dominio](docs/MD)
 ---
 ## 📋 Lista de Casos de Uso
 
