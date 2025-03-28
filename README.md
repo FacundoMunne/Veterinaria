@@ -1,32 +1,77 @@
-# Veterinaria
-Veterinaria/Java
-Propuesta TP JAVA
+# 📌 Sistema de Gestión para Clínica Veterinaria
 
-Integrantes:
+## 👥 Integrantes
+- **51358** - Colman, Gerónimo
+- **50361** - Munné, Facundo
 
-51358 - Colman, Geronimo
-50361 - Munné, Facundo
-Resumen del sistema:
-El sistema propuesto es para una clínica veterinaria busca modernizar y optimizar la gestión de la clínica, permitiendo el almacenamiento eficiente de información sobre profesionales, clientes (dueños de mascotas) y servicios ofrecidos. La implementación del sistema facilitará el acceso rápido a la información, agilizando procesos como el registro de mascotas y clientes, el seguimiento de procedimientos médicos y estéticos, y la gestión de otras tareas. Además, el sistema mejorará la autenticación de usuarios y la trazabilidad de acciones realizadas, garantizando un flujo de trabajo más ordenado y transparente para todo el personal de la institución y los clientes.
+## 📖 Resumen del Sistema
+El sistema propuesto busca **modernizar y optimizar la gestión** de una clínica veterinaria, permitiendo un almacenamiento eficiente de información sobre **profesionales y clientes** (dueños de mascotas).
 
-Borrador del modelo de dominio:
+🔹 **Principales beneficios:**
+- Acceso rápido a la información.
+- Agilización del registro de clientes y mascotas.
+- Seguimiento detallado de los procedimientos médicos.
+- Mejora en la autenticación de usuarios y trazabilidad de acciones.
+- Flujo de trabajo más ordenado y transparente para el personal y los clientes.
 
+---
+## 📌 Modelo de Dominio
+*(Aquí puedes insertar una imagen del modelo de dominio generado en draw.io u otro software.)*
 
+---
+## 📋 Lista de Casos de Uso
 
+### ✅ ABMC Simples
+- **Registro de Clientes**
+- **Registro de Profesionales**
 
-Lista de nombres de los Casos de Uso para la regularidad:
+### ✅ ABMC Dependientes
+- **Registro de Mascotas**
 
-ABMC Simple 1: Registro de Clientes
-ABMC Simple 2: Registro de Profesionales
-ABMC Dependiente: Registro de Mascotas
-CU No-ABMC: Sacar turno para consulta 
-Listado Simple: Listado de Turnos
+### ✅ Casos de Uso No-ABMC
+- **Sacar turno para consulta**
+- **Realizar observación**
 
+### 📜 Listados
+- **Listado de Mascotas** (Simple)
+- **Listado de Clientes** (Simple)
+- **Listado de Profesionales** (Simple)
+- **Listado de Turnos** (Complejo)
 
-Lista de nombres de los Casos de Uso para la aprobación directa:
+---
+## 🔐 Niveles de Acceso
+- **Administrador** 👨‍💼
+- **Paciente (Dueño de Mascota)** 🐾
+- **Profesional (Veterinario)** 🩺
 
+---
+## 🚀 Instalación y Ejecución
+1. Clona el repositorio:  
+   ```bash
+   git clone https://github.com/tu-usuario/tu-repo.git
+   ```
+2. Configura la base de datos (detalles en `config/database.sql`).
+3. Inicia el servidor con:
+   ```bash
+   npm start  # Si usas Node.js
+   ```
+   o
+   ```bash
+   mvn spring-boot:run  # Si usas Java Spring Boot
+   ```
 
+*(Ajusta los pasos según la tecnología que estés usando)*
 
-2 Nivel de acceso:
-Administrador
-Profesional
+---
+## 📌 Contribuciones
+Si deseas contribuir, ¡bienvenido! Por favor, sigue el flujo de trabajo de GitHub:
+1. Haz un **fork** del repositorio.
+2. Crea una rama con una nueva funcionalidad o corrección.
+3. Envía un **pull request** para revisión.
+
+---
+## 📜 Licencia
+Este proyecto está bajo la licencia **MIT**.
+
+✉️ Para consultas, contáctanos.
+
